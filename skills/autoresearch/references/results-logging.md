@@ -43,7 +43,7 @@ iteration	commit	metric	delta	status	description
 
 ## Summary Reporting
 
-Every 10 iterations, print a brief summary:
+Every 10 iterations (or at loop completion in bounded mode), print a brief summary:
 
 ```
 === Autoresearch Progress (iteration 20) ===

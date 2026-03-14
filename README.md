@@ -5,6 +5,7 @@
 Based on [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) — the principle that **constraint + mechanical metric + autonomous iteration = compounding gains**.
 
 [![Claude Code Skill](https://img.shields.io/badge/Claude_Code-Skill-blue?logo=anthropic&logoColor=white)](https://docs.anthropic.com/en/docs/claude-code)
+[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Based on](https://img.shields.io/badge/Based_on-Karpathy's_Autoresearch-orange)](https://github.com/karpathy/autoresearch)
 
@@ -21,7 +22,7 @@ You set the GOAL → Claude runs the LOOP → You wake up to results
 **The loop:**
 
 ```
-LOOP FOREVER:
+LOOP (FOREVER or N times):
   1. Review current state + git history + results log
   2. Pick the next change (based on what worked, what failed, what's untried)
   3. Make ONE focused change
@@ -29,7 +30,7 @@ LOOP FOREVER:
   5. Run mechanical verification (tests, benchmarks, scores)
   6. If improved → keep. If worse → git revert. If crashed → fix or skip.
   7. Log the result
-  8. Repeat. NEVER STOP. NEVER ASK "should I continue?"
+  8. Repeat. Default: NEVER STOP. With /loop N: stop after N iterations.
 ```
 
 Every improvement stacks. Every failure auto-reverts. Progress is logged in TSV format.
@@ -103,7 +104,59 @@ Claude will:
 4. Keep improvements, auto-revert failures
 5. Log every iteration in `autoresearch-results.tsv`
 6. Print a summary every 10 iterations
-7. **Never stop until you interrupt**
+7. **Never stop until you interrupt** (or until N iterations complete in bounded mode)
+
+---
+
+## Controlled Iterations with `/loop` (v1.0.1)
+
+> **Requires:** Claude Code **v1.0.32+** (the `/loop` command was introduced in this version)
+
+By default, autoresearch loops **forever** until manually interrupted. Starting in v1.0.1, you can optionally specify a **loop count** using Claude Code's built-in `/loop` command to run a fixed number of iterations.
+
+### Usage
+
+**Unlimited (default) — loop forever:**
+```
+/autoresearch
+Goal: Increase test coverage to 90%
+```
+
+**Bounded — run exactly N iterations:**
+```
+/loop 25 /autoresearch
+Goal: Increase test coverage to 90%
+```
+
+This chains `/autoresearch` with `/loop 25`, running exactly 25 iteration cycles. After 25 iterations, Claude stops and prints a final summary.
+
+### When to Use Bounded Loops
+
+| Scenario | Recommendation |
+|----------|---------------|
+| Run overnight, review in morning | Unlimited (default) |
+| Quick 30-min improvement session | `/loop 10 /autoresearch` |
+| Targeted fix with known scope | `/loop 5 /autoresearch` |
+| Exploratory — see if approach works | `/loop 15 /autoresearch` |
+| CI/CD pipeline integration | `/loop N /autoresearch` (set N based on time budget) |
+
+### Behavior with Loop Count
+
+When a loop count is specified:
+- Claude runs exactly **N iterations** through the autoresearch loop
+- After iteration N, Claude prints a **final summary** with baseline → current best, keeps/discards/crashes
+- If the goal is achieved before N iterations, Claude prints **early completion** and stops
+- All other rules (atomic changes, mechanical verification, auto-rollback) still apply
+- When **fewer than 3 iterations remain**, Claude prioritizes **exploiting successes** over exploration
+
+### Final Summary Format
+
+```
+=== Autoresearch Complete (25/25 iterations) ===
+Baseline: 72.0% → Final: 89.3% (+17.3%)
+Keeps: 12 | Discards: 11 | Crashes: 2
+Best iteration: #18 — add tests for payment processing edge cases
+```
 
 ---
 
@@ -151,7 +204,7 @@ Each iteration follows an 8-phase protocol:
 │  Append result to autoresearch-results.tsv          │
 │                                                     │
 │  Phase 8: REPEAT                                    │
-│  Go to Phase 1. NEVER STOP.                         │
+│  Go to Phase 1. Default: forever. /loop N: N times. │
 │                                                     │
 └─────────────────────────────────────────────────────┘
 ```
@@ -880,7 +933,7 @@ These rules govern Claude's behavior during the autonomous loop:
 
 | # | Rule | Why |
 |---|------|-----|
-| 1 | **NEVER STOP** | Loop until manually interrupted. User may be asleep. |
+| 1 | **Loop until done** | Unbounded: loop until interrupted. Bounded (`/loop N`): loop N times then summarize. |
 | 2 | **Read before write** | Always understand full context before modifying. |
 | 3 | **One change per iteration** | Atomic changes — if it breaks, you know exactly why. |
 | 4 | **Mechanical verification only** | No subjective "looks good." Use metrics. |
@@ -951,7 +1004,10 @@ The meta-principle:
 A: Yes. Copy the skill to `.claude/skills/autoresearch/` in any project. It works with any language, framework, or domain.
 
 **Q: How do I stop the loop?**
-A: Press `Ctrl+C` or close the terminal. Claude commits before verifying, so your last successful state is always preserved in git.
+A: Press `Ctrl+C` or close the terminal. Or use `/loop N /autoresearch` to run exactly N iterations and stop automatically. Claude commits before verifying, so your last successful state is always preserved in git.
+
+**Q: How do I run a fixed number of iterations?**
+A: Use `/loop N /autoresearch` (requires Claude Code v1.0.32+). For example, `/loop 25 /autoresearch` runs exactly 25 iterations then prints a summary and stops. See the "Controlled Iterations" section above.
 
 **Q: What if my verification takes too long?**
 A: Aim for under 10 seconds. Longer verification = fewer experiments = slower progress. Use the fastest check that still catches real problems.

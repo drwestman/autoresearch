@@ -1,20 +1,60 @@
 ---
 name: autoresearch
-description: Autonomous Goal-directed Iteration. Apply Karpathy's autoresearch principles to ANY task. Loops autonomously — modify, verify, keep/discard, repeat forever until stopped.
-version: 1.0.0
+description: Autonomous Goal-directed Iteration. Apply Karpathy's autoresearch principles to ANY task. Loops autonomously — modify, verify, keep/discard, repeat. Supports optional loop count via Claude Code's /loop command.
+version: 1.0.1
 ---
 
 # Claude Autoresearch — Autonomous Goal-directed Iteration
 
 Inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch). Applies constraint-driven autonomous iteration to ANY work — not just ML research.
 
-**Core idea:** You are an autonomous agent. Modify → Verify → Keep/Discard → Repeat. Never stop.
+**Core idea:** You are an autonomous agent. Modify → Verify → Keep/Discard → Repeat.
 
 ## When to Activate
 
 - User invokes `/autoresearch` or `/ug:autoresearch`
 - User says "work autonomously", "iterate until done", "keep improving", "run overnight"
 - Any task requiring repeated iteration cycles with measurable outcomes
+
+## Optional: Controlled Loop Count
+
+By default, autoresearch loops **forever** until manually interrupted. However, users can optionally specify a **loop count** to limit iterations using Claude Code's built-in `/loop` command.
+
+> **Requires:** Claude Code v1.0.32+ (the `/loop` command was introduced in this version)
+
+### Usage
+
+**Unlimited (default):**
+```
+/autoresearch
+Goal: Increase test coverage to 90%
+```
+
+**Bounded (N iterations):**
+```
+/loop 25 /autoresearch
+Goal: Increase test coverage to 90%
+```
+
+This chains `/autoresearch` with `/loop 25`, running exactly 25 iteration cycles. After 25 iterations, Claude stops and prints a final summary.
+
+### When to Use Bounded Loops
+
+| Scenario | Recommendation |
+|----------|---------------|
+| Run overnight, review in morning | Unlimited (default) |
+| Quick 30-min improvement session | `/loop 10 /autoresearch` |
+| Targeted fix with known scope | `/loop 5 /autoresearch` |
+| Exploratory — see if approach works | `/loop 15 /autoresearch` |
+| CI/CD pipeline integration | `/loop N /autoresearch` (set N based on time budget) |
+
+### Behavior with Loop Count
+
+When a loop count is specified:
+- Claude runs exactly N iterations through the autoresearch loop
+- After iteration N, Claude prints a **final summary** with baseline → current best, keeps/discards/crashes
+- If the goal is achieved before N iterations, Claude prints early completion and stops
+- All other rules (atomic changes, mechanical verification, auto-rollback) still apply
 
 ## Setup Phase (Do Once)
 
@@ -29,12 +69,12 @@ Inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch).
 5. **Establish baseline** — Run verification on current state. Record as iteration #0
 6. **Confirm and go** — Show user the setup, get confirmation, then BEGIN THE LOOP
 
-## The Loop (Runs Forever)
+## The Loop
 
 Read `references/autonomous-loop-protocol.md` for full protocol details.
 
 ```
-LOOP FOREVER:
+LOOP (FOREVER or N times):
   1. Review: Read current state + git history + results log
   2. Ideate: Pick next change based on goal, past results, what hasn't been tried
   3. Modify: Make ONE focused change to in-scope files
@@ -45,12 +85,14 @@ LOOP FOREVER:
      - SAME/WORSE → Git revert, log "discard"
      - CRASHED → Try to fix (max 3 attempts), else log "crash" and move on
   7. Log: Record result in results log
-  8. Repeat: Go to step 1. NEVER STOP. NEVER ASK "should I continue?"
+  8. Repeat: Go to step 1.
+     - If unbounded: NEVER STOP. NEVER ASK "should I continue?"
+     - If bounded (N): Stop after N iterations, print final summary
 ```
 
 ## Critical Rules
 
-1. **NEVER STOP** — Loop until manually interrupted. User may be asleep.
+1. **Loop until done** — Unbounded: loop until interrupted. Bounded: loop N times then summarize.
 2. **Read before write** — Always understand full context before modifying
 3. **One change per iteration** — Atomic changes. If it breaks, you know exactly why
 4. **Mechanical verification only** — No subjective "looks good". Use metrics
