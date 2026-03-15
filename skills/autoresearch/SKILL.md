@@ -1,7 +1,7 @@
 ---
 name: autoresearch
 description: Autonomous Goal-directed Iteration. Apply Karpathy's autoresearch principles to ANY task. Loops autonomously — modify, verify, keep/discard, repeat. Supports optional loop count via Claude Code's /loop command.
-version: 1.0.3
+version: 1.1.0
 ---
 
 # Claude Autoresearch — Autonomous Goal-directed Iteration
@@ -174,9 +174,10 @@ When a loop count is specified:
    - Design: lighthouse score, accessibility audit passes
    - If no metric exists → define one with user, or use simplest proxy (e.g. "compiles without errors")
 3. **Define scope constraints** — Which files can you modify? Which are read-only?
-4. **Create a results log** — Track every iteration (see `references/results-logging.md`)
-5. **Establish baseline** — Run verification on current state. Record as iteration #0
-6. **Confirm and go** — Show user the setup, get confirmation, then BEGIN THE LOOP
+4. **Define guard (optional)** — A command that must ALWAYS pass for a change to be kept. Use this to prevent regressions while optimizing the main metric (e.g., `npm test` must pass while optimizing benchmark time). If not specified, no guard is enforced.
+5. **Create a results log** — Track every iteration (see `references/results-logging.md`)
+6. **Establish baseline** — Run verification on current state AND guard (if set). Record as iteration #0
+7. **Confirm and go** — Show user the setup, get confirmation, then BEGIN THE LOOP
 
 ## The Loop
 
@@ -189,12 +190,17 @@ LOOP (FOREVER or N times):
   3. Modify: Make ONE focused change to in-scope files
   4. Commit: Git commit the change (before verification)
   5. Verify: Run the mechanical metric (tests, build, benchmark, etc.)
-  6. Decide:
-     - IMPROVED → Keep commit, log "keep", advance
+  6. Guard: If guard is set, run the guard command
+  7. Decide:
+     - IMPROVED + guard passed (or no guard) → Keep commit, log "keep", advance
+     - IMPROVED + guard FAILED → Revert, then try to rework the optimization
+       (max 2 attempts) so it improves the metric WITHOUT breaking the guard.
+       Never modify guard/test files — adapt the implementation instead.
+       If still failing → log "discard (guard failed)" and move on
      - SAME/WORSE → Git revert, log "discard"
      - CRASHED → Try to fix (max 3 attempts), else log "crash" and move on
-  7. Log: Record result in results log
-  8. Repeat: Go to step 1.
+  8. Log: Record result in results log
+  9. Repeat: Go to step 1.
      - If unbounded: NEVER STOP. NEVER ASK "should I continue?"
      - If bounded (N): Stop after N iterations, print final summary
 ```
@@ -216,14 +222,14 @@ See `references/core-principles.md` for the 7 generalizable principles from auto
 
 ## Adapting to Different Domains
 
-| Domain | Metric | Scope | Verify Command |
-|--------|--------|-------|----------------|
-| Backend code | Tests pass + coverage % | `src/**/*.ts` | `npm test` |
-| Frontend UI | Lighthouse score | `src/components/**` | `npx lighthouse` |
-| ML training | val_bpb / loss | `train.py` | `uv run train.py` |
-| Blog/content | Word count + readability | `content/*.md` | Custom script |
-| Performance | Benchmark time (ms) | Target files | `npm run bench` |
-| Refactoring | Tests pass + LOC reduced | Target module | `npm test && wc -l` |
-| Security | OWASP + STRIDE coverage + findings | API/auth/middleware | `/autoresearch:security` |
+| Domain | Metric | Scope | Verify Command | Guard |
+|--------|--------|-------|----------------|-------|
+| Backend code | Tests pass + coverage % | `src/**/*.ts` | `npm test` | — |
+| Frontend UI | Lighthouse score | `src/components/**` | `npx lighthouse` | `npm test` |
+| ML training | val_bpb / loss | `train.py` | `uv run train.py` | — |
+| Blog/content | Word count + readability | `content/*.md` | Custom script | — |
+| Performance | Benchmark time (ms) | Target files | `npm run bench` | `npm test` |
+| Refactoring | Tests pass + LOC reduced | Target module | `npm test && wc -l` | `npm run typecheck` |
+| Security | OWASP + STRIDE coverage + findings | API/auth/middleware | `/autoresearch:security` | — |
 
 Adapt the loop to your domain. The PRINCIPLES are universal; the METRICS are domain-specific.

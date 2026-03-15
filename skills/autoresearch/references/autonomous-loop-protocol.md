@@ -66,19 +66,68 @@ Run the agreed-upon verification command. Capture output.
 
 **Extract metric:** Parse the verification output for the specific metric number.
 
+## Phase 5.5: Guard (Regression Check)
+
+If a **guard** command was defined during setup, run it after verification.
+
+The guard is a command that must ALWAYS pass — it protects existing functionality while the main metric is being optimized. Common guards: `npm test`, `npm run typecheck`, `pytest`, `cargo test`.
+
+**Key distinction:**
+- **Verify** answers: "Did the metric improve?" (the goal)
+- **Guard** answers: "Did anything else break?" (the safety net)
+
+**Guard rules:**
+- Only run if a guard was defined (it's optional)
+- Run AFTER verify — no point checking guard if the metric didn't improve
+- Guard is pass/fail only (exit code 0 = pass). No metric extraction needed
+- If guard fails, revert the optimization and try to rework it (max 2 attempts)
+- NEVER modify guard/test files — always adapt the implementation instead
+- Log guard failures distinctly so the agent can learn what kinds of changes cause regressions
+
+**Guard failure recovery (max 2 rework attempts):**
+
+When the guard fails but the metric improved, the optimization idea may still be viable — it just needs a different implementation that doesn't break behavior:
+
+1. Revert the change (`git reset --hard HEAD~1`)
+2. Read the guard output to understand WHAT broke (which tests, which assertions)
+3. Rework the optimization to avoid the regression — e.g.:
+   - If inlining a function broke callers → try a different optimization angle
+   - If changing a data structure broke serialization → preserve the interface
+   - If reordering logic broke edge cases → add the optimization more surgically
+4. Commit the reworked version, re-run verify + guard
+5. If both pass → keep. If guard fails again → one more attempt, then give up
+
+**Critical:** Guard/test files are read-only. The optimization must adapt to the tests, never the other way around. If after 2 rework attempts the optimization can't pass the guard, discard it and move on to a different idea.
+
 ## Phase 6: Decide (No Ambiguity)
 
 ```
-IF metric_improved:
+IF metric_improved AND (no guard OR guard_passed):
     STATUS = "keep"
     # Do nothing — commit stays
+ELIF metric_improved AND guard_failed:
+    git reset --hard HEAD~1
+    # Rework the optimization (max 2 attempts)
+    FOR attempt IN 1..2:
+        Analyze guard output → rework implementation (NOT tests)
+        git add + commit reworked version
+        Re-run verify
+        IF metric_improved:
+            Re-run guard
+            IF guard_passed:
+                STATUS = "keep (reworked)"
+                BREAK
+        git reset --hard HEAD~1
+    IF still failing after 2 attempts:
+        STATUS = "discard"
+        REASON = "guard failed, could not rework optimization"
 ELIF metric_same_or_worse:
     STATUS = "discard"
     git reset --hard HEAD~1
 ELIF crashed:
     # Attempt fix (max 3 tries)
     IF fixable:
-        Fix → re-commit → re-verify
+        Fix → re-commit → re-verify → re-guard
     ELSE:
         STATUS = "crash"
         git reset --hard HEAD~1
