@@ -322,6 +322,18 @@ Areas of interest: new domain examples, verification script templates, CI/CD int
 
 ---
 
+## Star History
+
+<a href="https://www.star-history.com/?repos=uditgoenka%2Fautoresearch&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=uditgoenka/autoresearch&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=uditgoenka/autoresearch&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=uditgoenka/autoresearch&type=date&legend=top-left" />
+ </picture>
+</a>
+
+---
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
