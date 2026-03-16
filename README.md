@@ -7,7 +7,7 @@
 Based on [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) — constraint + mechanical metric + autonomous iteration = compounding gains.
 
 [![Claude Code Skill](https://img.shields.io/badge/Claude_Code-Skill-blue?logo=anthropic&logoColor=white)](https://docs.anthropic.com/en/docs/claude-code)
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Based on](https://img.shields.io/badge/Based_on-Karpathy's_Autoresearch-orange)](https://github.com/karpathy/autoresearch)
 [![Follow @iuditg](https://img.shields.io/badge/Follow-@iuditg-000000?style=flat&logo=x&logoColor=white)](https://x.com/intent/follow?screen_name=iuditg)
@@ -84,6 +84,8 @@ Before looping, Claude performs a one-time setup:
 | `/autoresearch:plan` | Interactive wizard: Goal → Scope, Metric, Verify config |
 | `/autoresearch:security` | Autonomous STRIDE + OWASP + red-team security audit |
 | `/autoresearch:ship` | Universal shipping workflow (code, content, marketing, sales, research, design) |
+| `/autoresearch:debug` | Autonomous bug-hunting loop — scientific method + iterative investigation |
+| `/autoresearch:fix` | Autonomous fix loop — iteratively repair errors until zero remain |
 | `Guard: <command>` | Optional safety net — must pass for changes to be kept |
 
 ### Quick Decision Guide
@@ -95,6 +97,9 @@ Before looping, Claude performs a one-time setup:
 | Run a security audit | `/autoresearch:security` |
 | Ship a PR / deployment / release | `/autoresearch:ship` |
 | Optimize without breaking existing tests | Add `Guard: npm test` |
+| Hunt all bugs in a codebase | `/autoresearch:debug` or `/loop 20 /autoresearch:debug` |
+| Fix all errors (tests, types, lint) | `/autoresearch:fix` |
+| Debug then auto-fix | `/autoresearch:debug --fix` |
 | Check if something is ready to ship | `/autoresearch:ship --checklist-only` |
 
 ---
@@ -215,6 +220,52 @@ Auto-detects what you're shipping (code PR, deployment, blog post, email campaig
 
 ---
 
+## /autoresearch:debug — Autonomous Bug Hunter (v1.3.0)
+
+Scientific method meets autoresearch loop. Doesn't stop at one bug — iteratively hunts ALL bugs using falsifiable hypotheses, evidence-based investigation, and 7 investigation techniques.
+
+```
+/loop 20 /autoresearch:debug
+Scope: src/api/**/*.ts
+Symptom: API returns 500 on POST /users
+```
+
+**How it works:** Gather symptoms → Recon (map error surface) → Hypothesize (specific, testable) → Test (one experiment per iteration) → Classify (confirmed/disproven/inconclusive) → Log → Repeat.
+
+Every finding requires **code evidence** (file:line + reproduction steps). Every disproven hypothesis is logged — equally valuable. Uses 7 techniques: binary search, differential debugging, minimal reproduction, trace execution, pattern search, working backwards, rubber duck.
+
+| Flag | Purpose |
+|------|---------|
+| `--fix` | After hunting, auto-switch to `/autoresearch:fix` |
+| `--scope <glob>` | Limit investigation scope |
+| `--symptom "<text>"` | Pre-fill symptom |
+| `--severity <level>` | Minimum severity to report |
+
+---
+
+## /autoresearch:fix — Autonomous Error Crusher (v1.3.0)
+
+Takes a broken state and iteratively repairs it until everything passes. ONE fix per iteration. Atomic, committed, verified, auto-reverted on failure.
+
+```
+/autoresearch:fix
+```
+
+**How it works:** Auto-detects what's broken (tests, types, lint, build) → Prioritizes (blockers first) → Fixes ONE thing → Commits → Verifies error count decreased → Guard check (no regressions) → Keep/Revert → Repeat until zero errors.
+
+**Stops automatically when error count hits zero** — even in unbounded mode.
+
+| Flag | Purpose |
+|------|---------|
+| `--target <command>` | Explicit verify command |
+| `--guard <command>` | Safety command that must always pass |
+| `--category <type>` | Only fix specific type (test, type, lint, build) |
+| `--from-debug` | Read findings from latest debug session |
+
+**Chain them:** `/loop 15 /autoresearch:debug` then `/loop 30 /autoresearch:fix --from-debug`
+
+---
+
 ## Guard — Prevent Regressions (v1.0.4)
 
 When optimizing a metric, the loop might break existing behavior. **Guard** is an optional safety net.
@@ -277,7 +328,9 @@ autoresearch/
 │   └── autoresearch/
 │       ├── ship.md                                ← /autoresearch:ship registration
 │       ├── plan.md                                ← /autoresearch:plan registration
-│       └── security.md                            ← /autoresearch:security registration
+│       ├── security.md                            ← /autoresearch:security registration
+│       ├── debug.md                               ← /autoresearch:debug registration
+│       └── fix.md                                 ← /autoresearch:fix registration
 └── skills/
     └── autoresearch/
         ├── SKILL.md                               ← Main skill (loaded by Claude Code)
@@ -287,6 +340,8 @@ autoresearch/
             ├── plan-workflow.md                   ← Plan wizard protocol
             ├── security-workflow.md               ← Security audit protocol
             ├── ship-workflow.md                   ← Ship workflow protocol
+            ├── debug-workflow.md                  ← Debug loop protocol
+            ├── fix-workflow.md                    ← Fix loop protocol
             └── results-logging.md                 ← TSV tracking format
 ```
 

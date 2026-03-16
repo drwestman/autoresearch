@@ -2,7 +2,7 @@
 
 Real-world examples organized by domain, with practical configurations you can copy-paste.
 
-[Software Engineering](#software-engineering) · [Sales](#sales) · [Marketing](#marketing) · [HR & People Ops](#hr--people-ops) · [Operations](#operations) · [Performance Marketing](#performance-marketing) · [Data Science](#data-science) · [DevOps](#devops) · [Design & Accessibility](#design--accessibility) · [MCP Servers](#combining-with-mcp-servers) · [API Patterns](#combining-with-apis) · [Claude Code Patterns](#claude-code-patterns) · [Plan Wizard Examples](#plan-wizard-examples) · [Security Audit Examples](#security-audit-examples) · [Ship Workflow Examples](#ship-workflow-examples) · [Verification Scripts](#writing-verification-scripts) · [Core Principles](#core-principles)
+[Software Engineering](#software-engineering) · [Sales](#sales) · [Marketing](#marketing) · [HR & People Ops](#hr--people-ops) · [Operations](#operations) · [Performance Marketing](#performance-marketing) · [Data Science](#data-science) · [DevOps](#devops) · [Design & Accessibility](#design--accessibility) · [Debug Examples](#debug-examples) · [Fix Examples](#fix-examples) · [MCP Servers](#combining-with-mcp-servers) · [API Patterns](#combining-with-apis) · [Claude Code Patterns](#claude-code-patterns) · [Plan Wizard Examples](#plan-wizard-examples) · [Security Audit Examples](#security-audit-examples) · [Ship Workflow Examples](#ship-workflow-examples) · [Verification Scripts](#writing-verification-scripts) · [Core Principles](#core-principles)
 
 ---
 
@@ -412,6 +412,186 @@ Goal: Replace all hardcoded colors/spacing with design tokens
 Scope: src/**/*.tsx, src/**/*.css
 Metric: hardcoded values count (lower is better)
 Verify: grep -rE "#[0-9a-fA-F]{3,6}|px\b" src/ --include="*.tsx" --include="*.css" | wc -l
+```
+
+---
+
+## Debug Examples
+
+### Hunt all bugs in a codebase
+
+```
+/autoresearch:debug
+Scope: src/**/*.ts
+```
+
+Claude scans the codebase, runs tests/lint/typecheck, and iteratively investigates every failure using the scientific method — one hypothesis per iteration.
+
+### Debug a specific error
+
+```
+/autoresearch:debug
+Symptom: API returns 500 on POST /users
+Scope: src/api/**/*.ts
+```
+
+### Bounded bug hunt
+
+```
+/loop 20 /autoresearch:debug
+Scope: src/auth/**/*.ts
+```
+
+20 investigation iterations focused on auth code.
+
+### Debug then auto-fix
+
+```
+/autoresearch:debug --fix
+```
+
+Hunts bugs first, then automatically switches to `/autoresearch:fix` to repair everything found.
+
+### Debug by domain
+
+```
+# API debugging — checks routes, middleware, serialization
+/autoresearch:debug
+Scope: src/api/**/*.ts
+Symptom: 404 on valid routes
+
+# Database debugging — checks queries, transactions, N+1
+/autoresearch:debug
+Scope: src/models/**/*.ts
+Symptom: Slow queries on dashboard page
+
+# Auth debugging — checks JWT, permissions, escalation
+/autoresearch:debug
+Scope: src/auth/**/*.ts, src/middleware/**/*.ts
+Symptom: Regular users can access admin endpoints
+```
+
+### Example debug session output
+
+```
+> /loop 10 /autoresearch:debug
+
+[Phase 1] Gathering symptoms...
+  Tests: 3 failures, Lint: 0 errors, Types: 2 errors
+
+[Iteration 1] Hypothesis: "db.insert() missing await at db.ts:88"
+  → CONFIRMED HIGH — silent write failure on error path
+
+[Iteration 2] Hypothesis: "JWT alg not validated at auth.ts:42"
+  → CONFIRMED CRITICAL — algorithm confusion vulnerability
+
+[Iteration 3] Hypothesis: "Rate limiting missing on /api/auth/login"
+  → CONFIRMED MEDIUM — brute force possible
+
+[Iteration 4] Hypothesis: "SQL injection via string concat in search"
+  → DISPROVEN — parameterized queries used correctly
+
+=== Debug Complete (10/10 iterations) ===
+Bugs found: 3 (1 Critical, 1 High, 1 Medium)
+Hypotheses: 10 tested (3 confirmed, 6 disproven, 1 inconclusive)
+Files investigated: 14 / 47 in scope
+```
+
+---
+
+## Fix Examples
+
+### Fix all errors automatically
+
+```
+/autoresearch:fix
+```
+
+Auto-detects what's broken (tests, types, lint, build), prioritizes by severity, and fixes ONE thing per iteration until zero errors.
+
+### Fix with guard
+
+```
+/autoresearch:fix
+Target: tsc --noEmit
+Guard: npm test
+```
+
+Fixes type errors while ensuring tests keep passing.
+
+### Fix only tests
+
+```
+/autoresearch:fix --category test
+```
+
+### Fix only TypeScript errors
+
+```
+/autoresearch:fix --category type --guard "npm test"
+```
+
+### Fix from debug findings
+
+```
+# Step 1: Hunt bugs
+/loop 15 /autoresearch:debug
+
+# Step 2: Fix what was found
+/loop 30 /autoresearch:fix --from-debug
+```
+
+### Bounded fix sprint
+
+```
+/loop 20 /autoresearch:fix
+```
+
+Fix as many errors as possible in 20 iterations.
+
+### Example fix session output
+
+```
+> /autoresearch:fix
+
+[Phase 1] Detected: 47 test failures, 12 type errors, 3 lint errors
+[Phase 2] Priority: types first (may cascade-fix test failures)
+
+[Iteration 1] Fix: auth.ts:42 — add return type annotation
+  delta: -2 errors | guard: pass | STATUS: KEEP
+
+[Iteration 2] Fix: db.ts:15 — handle nullable column
+  delta: -1 error | guard: pass | STATUS: KEEP
+
+[Iteration 3] Fix: api.test.ts — fix expected status 200→201
+  delta: -3 errors | guard: pass | STATUS: KEEP
+
+[Iteration 4] Fix: auth.test.ts — wrong approach
+  delta: 0 errors | guard: - | STATUS: DISCARD (reverted)
+
+...
+
+=== Fix Complete (23 iterations) ===
+Baseline: 62 errors → Final: 3 errors (-95.2%)
+Keeps: 19 | Discards: 3 | Reworks: 1
+Blocked: 1 (circular dependency — escalated to /autoresearch:debug)
+```
+
+### Fix CI/CD failures
+
+```
+/autoresearch:fix
+Target: gh run view --log-failed
+Scope: .github/workflows/*.yml
+```
+
+### Fix after dependency upgrade
+
+```
+/autoresearch:fix
+Target: npm test
+Guard: tsc --noEmit
+Scope: src/**/*.ts
 ```
 
 ---

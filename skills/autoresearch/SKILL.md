@@ -1,7 +1,7 @@
 ---
 name: autoresearch
 description: Autonomous Goal-directed Iteration. Apply Karpathy's autoresearch principles to ANY task. Loops autonomously — modify, verify, keep/discard, repeat. Supports optional loop count via Claude Code's /loop command.
-version: 1.2.0
+version: 1.3.0
 ---
 
 # Claude Autoresearch — Autonomous Goal-directed Iteration
@@ -18,6 +18,8 @@ Inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch).
 | `/autoresearch:plan` | Interactive wizard to build Scope, Metric, Direction & Verify from a Goal |
 | `/autoresearch:security` | Autonomous security audit: STRIDE threat model + OWASP Top 10 + red-team (4 adversarial personas) |
 | `/autoresearch:ship` | Universal shipping workflow: ship code, content, marketing, sales, research, or anything |
+| `/autoresearch:debug` | Autonomous bug-hunting loop: scientific method + iterative investigation until codebase is clean |
+| `/autoresearch:fix` | Autonomous fix loop: iteratively repair errors (tests, types, lint, build) until zero remain |
 
 ### /autoresearch:security — Autonomous Security Audit (v1.0.3)
 
@@ -211,6 +213,10 @@ After the wizard completes, the user gets a ready-to-paste `/autoresearch` invoc
 - User says "security audit", "threat model", "OWASP", "STRIDE", "find vulnerabilities", "red-team" → run the security audit
 - User invokes `/autoresearch:ship` → run the ship workflow
 - User says "ship it", "deploy this", "publish this", "launch this", "get this out the door" → run the ship workflow
+- User invokes `/autoresearch:debug` → run the debug loop
+- User says "find all bugs", "hunt bugs", "debug this", "why is this failing", "investigate" → run the debug loop
+- User invokes `/autoresearch:fix` → run the fix loop
+- User says "fix all errors", "make tests pass", "fix the build", "clean up errors" → run the fix loop
 - User says "work autonomously", "iterate until done", "keep improving", "run overnight" → run the loop
 - Any task requiring repeated iteration cycles with measurable outcomes → run the loop
 
@@ -321,5 +327,7 @@ See `references/core-principles.md` for the 7 generalizable principles from auto
 | Refactoring | Tests pass + LOC reduced | Target module | `npm test && wc -l` | `npm run typecheck` |
 | Security | OWASP + STRIDE coverage + findings | API/auth/middleware | `/autoresearch:security` | — |
 | Shipping | Checklist pass rate (%) | Any artifact | `/autoresearch:ship` | Domain-specific |
+| Debugging | Bugs found + coverage | Target files | `/autoresearch:debug` | — |
+| Fixing | Error count (lower) | Target files | `/autoresearch:fix` | `npm test` |
 
 Adapt the loop to your domain. The PRINCIPLES are universal; the METRICS are domain-specific.
