@@ -116,30 +116,15 @@ Before looping, Claude performs a one-time setup:
 
 **Option A — Plugin install (recommended):**
 
-**Step 1:** Register the autoresearch marketplace (one-time). Add this entry to `~/.claude/plugins/known_marketplaces.json`:
-
-```json
-{
-  "autoresearch": {
-    "source": { "source": "github", "repo": "uditgoenka/autoresearch" },
-    "installLocation": "<HOME>/.claude/plugins/marketplaces/autoresearch",
-    "lastUpdated": "2026-03-16T00:00:00.000Z"
-  }
-}
+In Claude Code, run:
 ```
-
-> Replace `<HOME>` with your home directory path (e.g., `/Users/yourname` on macOS, `C:\\Users\\yourname` on Windows, `/home/yourname` on Linux). If the file already has entries, add `"autoresearch": { ... }` as a new key alongside the existing ones.
-
-**Step 2:** Restart Claude Code, then run:
-
-```bash
+/plugin marketplace add uditgoenka/autoresearch
 /plugin install autoresearch@autoresearch
 ```
 
-That's it. All 6 commands are available immediately.
+That's it. All 6 commands are available after running `/reload-plugins` or restarting Claude Code.
 
 **Option B — Manual copy:**
-
 ```bash
 git clone https://github.com/uditgoenka/autoresearch.git
 
@@ -149,7 +134,6 @@ cp -r autoresearch/commands/autoresearch .claude/commands/autoresearch
 ```
 
 Or install globally:
-
 ```bash
 cp -r autoresearch/skills/autoresearch ~/.claude/skills/autoresearch
 cp -r autoresearch/commands/autoresearch ~/.claude/commands/autoresearch
