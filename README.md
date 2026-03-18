@@ -125,7 +125,14 @@ In Claude Code, run:
 /plugin install autoresearch@autoresearch
 ```
 
-That's it. All 6 commands are available after running `/reload-plugins` or restarting Claude Code.
+That's it. All 8 commands are available after running `/reload-plugins` or restarting Claude Code.
+
+**Updating (no reinstall needed):**
+```
+/plugin update autoresearch
+```
+
+That pulls the latest version. Run `/reload-plugins` to activate. No need to uninstall or re-clone.
 
 **Option B — Manual copy:**
 ```bash
