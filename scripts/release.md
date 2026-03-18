@@ -21,22 +21,22 @@
 ## What the Script Does
 
 ```
-[1/6] Create release branch (release/X.Y.Z)
-[2/6] Bump versions:
+[1/7] Create release branch (release/X.Y.Z)
+[2/7] Bump versions:
       → .claude-plugin/plugin.json       (version field)
       → .claude-plugin/marketplace.json  (version fields — top-level + plugins array)
       → README.md                        (version badge)
       → guide/README.md                  (version badge)
-[3/6] Sync distribution files:
+[3/7] Sync distribution files:
       → Copies .claude/commands/autoresearch/ → commands/autoresearch/
       → Copies .claude/skills/autoresearch/  → skills/autoresearch/
       → Ensures root distribution matches .claude/ source of truth
-[4/6] Pause for doc review:
+[4/7] Pause for doc review:
       → Shows changelog since last tag
       → Prompts you to review README.md, guide/, CONTRIBUTING.md
       → You can edit in another terminal, then continue
-[5/6] Commit all release changes
-[6/6] Push branch + create PR against master
+[5/7] Commit all release changes
+[6/7] Push branch + create PR against master
 [7/7] Wait for your "merge" confirmation:
       → Merges PR
       → Tags the merge commit
@@ -54,7 +54,7 @@ Before running the script, verify:
 
 ## Doc Review Guide
 
-At step [3/6], the script pauses and shows the changelog. Review these files:
+At step [4/7], the script pauses and shows the changelog. Review these files:
 
 ### README.md
 - **Version badge** (auto-updated by script)
