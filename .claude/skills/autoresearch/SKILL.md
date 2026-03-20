@@ -14,7 +14,7 @@ Inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch).
 
 **CRITICAL — READ THIS FIRST BEFORE ANY ACTION:**
 
-For ALL commands (`/autoresearch`, `/autoresearch:plan`, `/autoresearch:debug`, `/autoresearch:fix`, `/autoresearch:security`, `/autoresearch:ship`, `/autoresearch:scenario`, `/autoresearch:predict`):
+For ALL commands (`/autoresearch`, `/autoresearch:plan`, `/autoresearch:debug`, `/autoresearch:fix`, `/autoresearch:security`, `/autoresearch:ship`, `/autoresearch:scenario`, `/autoresearch:predict`, `/autoresearch:learn`):
 
 1. **Check if the user provided ALL required context inline** (Goal, Scope, Metric, flags, etc.)
 2. **If ANY required context is missing → you MUST use `AskUserQuestion` to collect it BEFORE proceeding to any execution phase.** DO NOT skip this step. DO NOT proceed without user input.
@@ -30,6 +30,7 @@ For ALL commands (`/autoresearch`, `/autoresearch:plan`, `/autoresearch:debug`, 
 | `/autoresearch:ship` | What/Type, Mode | 3 batched questions per `references/ship-workflow.md` |
 | `/autoresearch:scenario` | Scenario, Domain | 4-8 adaptive questions per `references/scenario-workflow.md` |
 | `/autoresearch:predict` | Scope, Goal | 3-4 batched questions per `references/predict-workflow.md` |
+| `/autoresearch:learn` | Mode, Scope | 4 batched questions per `references/learn-workflow.md` |
 
 **YOU MUST NOT start any loop, phase, or execution without completing interactive setup when context is missing. This is a BLOCKING prerequisite.**
 
@@ -45,6 +46,7 @@ For ALL commands (`/autoresearch`, `/autoresearch:plan`, `/autoresearch:debug`, 
 | `/autoresearch:fix` | Autonomous fix loop: iteratively repair errors (tests, types, lint, build) until zero remain |
 | `/autoresearch:scenario` | Scenario-driven use case generator: explore situations, edge cases, and derivative scenarios |
 | `/autoresearch:predict` | Multi-persona swarm prediction: pre-analyze code from multiple expert perspectives before acting |
+| `/autoresearch:learn` | Autonomous codebase documentation engine: scout, learn, generate/update docs with validation-fix loop |
 
 ### /autoresearch:security — Autonomous Security Audit
 
@@ -331,6 +333,79 @@ Scope: src/**
 Goal: Full quality pipeline for new feature
 ```
 
+### /autoresearch:learn — Autonomous Codebase Documentation Engine
+
+Scouts codebase structure, learns patterns and architecture, generates/updates comprehensive documentation — then validates and iteratively improves until docs match codebase reality.
+
+Load: `references/learn-workflow.md` for full protocol.
+
+**What it does:**
+
+1. **Scout** — parallel codebase reconnaissance with scale awareness and monorepo detection
+2. **Analyze** — project type classification, tech stack detection, staleness measurement
+3. **Map** — dynamic doc discovery (`docs/*.md`), gap analysis, conditional doc selection
+4. **Generate** — spawn docs-manager with structured prompt template and full context
+5. **Validate** — mechanical verification (code refs, links, completeness, size compliance)
+6. **Fix** — validation-fix loop: re-generate failed docs with feedback (max 3 retries)
+7. **Finalize** — inventory check, git diff summary, size compliance
+8. **Log** — record results to learn-results.tsv
+
+**4 Modes:**
+
+| Mode | Purpose | Autoresearch Loop? |
+|------|---------|-------------------|
+| `init` | Learn codebase from scratch, generate all docs | Yes — validate-fix cycle |
+| `update` | Learn what changed, refresh existing docs | Yes — validate-fix cycle |
+| `check` | Read-only health/staleness assessment | No — diagnostic only |
+| `summarize` | Quick codebase summary with file inventory | Minimal — size check only |
+
+**Key behaviors:**
+- Fully dynamic doc discovery — scans `docs/*.md`, no hardcoded file lists
+- State-aware mode detection — auto-selects init/update based on docs/ state
+- Project-type-adaptive — creates deployment-guide.md only if deployment config exists
+- Validation-fix loop capped at 3 retries — escalates to user if unresolved
+- Scale-aware scouting — adjusts parallelism for 5k+ file codebases
+- Composite metric: `learn_score = validation%×0.5 + coverage%×0.3 + size_compliance%×0.2`
+- Creates `learn/{YYMMDD}-{HHMM}-{slug}/` with: `learn-results.tsv`, `summary.md`, `validation-report.md`, `scout-context.md`
+
+**Flags:**
+
+| Flag | Purpose |
+|------|---------|
+| `--mode <mode>` | Operation: init, update, check, summarize (default: auto-detect) |
+| `--scope <glob>` | Limit codebase learning to specific dirs |
+| `--depth <level>` | Doc comprehensiveness: quick, standard, deep |
+| `--scan` | Force fresh scout in summarize mode |
+| `--topics <list>` | Focus summarize on specific topics |
+| `--file <name>` | Selective update — target single doc |
+| `--no-fix` | Skip validation-fix loop |
+
+**Usage:**
+```
+# Auto-detect mode and learn
+/autoresearch:learn
+
+# Initialize docs for new project
+/autoresearch:learn --mode init --depth deep
+
+# Update docs after changes
+/autoresearch:learn --mode update
+Iterations: 3
+
+# Read-only health check
+/autoresearch:learn --mode check
+
+# Quick summary
+/autoresearch:learn --mode summarize --scan
+
+# Selective update of one doc
+/autoresearch:learn --mode update --file system-architecture.md
+
+# Scoped learning
+/autoresearch:learn --scope src/api/**
+Iterations: 5
+```
+
 ### /autoresearch:plan — Goal → Configuration Wizard
 
 Converts a plain-language goal into a validated, ready-to-execute autoresearch configuration.
@@ -379,6 +454,8 @@ After the wizard completes, the user gets a ready-to-paste `/autoresearch` invoc
 - User says "fix all errors", "make tests pass", "fix the build", "clean up errors" → run the fix loop
 - User invokes `/autoresearch:scenario` → run the scenario loop
 - User says "explore scenarios", "generate use cases", "what could go wrong", "stress test this feature", "edge cases for" → run the scenario loop
+- User invokes `/autoresearch:learn` → run the learn workflow
+- User says "learn this codebase", "generate docs", "document this project", "create documentation", "update docs", "check docs", "docs health" → run the learn workflow
 - User invokes `/autoresearch:predict` → run the predict workflow
 - User says "predict", "multi-perspective", "swarm analysis", "what do multiple experts think", "analyze from different angles" → run the predict workflow
 - User says "work autonomously", "iterate until done", "keep improving", "run overnight" → run the loop
@@ -514,5 +591,6 @@ See `references/core-principles.md` for the 7 generalizable principles from auto
 | Scenario analysis | Scenario coverage score (higher) | Feature/domain files | `/autoresearch:scenario` | — |
 | Scenarios | Use cases + edge cases + dimension coverage | Target feature/files | `/autoresearch:scenario` | — |
 | Prediction | Findings + hypotheses (higher) | Target files | `/autoresearch:predict` | — |
+| Documentation | Validation pass rate (higher) | `docs/*.md` | `/autoresearch:learn` | `npm test` |
 
 Adapt the loop to your domain. The PRINCIPLES are universal; the METRICS are domain-specific.

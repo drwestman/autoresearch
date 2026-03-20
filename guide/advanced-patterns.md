@@ -737,6 +737,14 @@ A: `/autoresearch:security` uses red-team personas (security adversary, supply c
 **Q: What's a good budget for a first run?**
 A: Start with `Iterations: 10` to calibrate. Review the TSV log. If results look promising, remove the limit or increase to 25-50.
 
+### Can I use `learn` with monorepos?
+
+Yes. The scouting phase detects workspace configs (`package.json` workspaces, `lerna.json`, `pnpm-workspace.yaml`, `Cargo.toml [workspace]`) and notes the structure in the generation context. Use `--scope packages/api/**` to focus on a specific package.
+
+### What's the validation-fix loop?
+
+After generating docs, Claude runs `validate-docs.cjs` (if it exists) to check code references, internal links, and config keys. If any fail, it re-spawns the docs-manager with specific issues to fix — up to 3 retries. This prevents hallucinated code references that plague one-shot doc generators.
+
 ---
 
 ## Crash Recovery

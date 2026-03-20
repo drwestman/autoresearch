@@ -50,7 +50,8 @@ autoresearch/
 │   │       ├── debug.md                           ← /autoresearch:debug registration
 │   │       ├── fix.md                             ← /autoresearch:fix registration
 │   │       ├── scenario.md                        ← /autoresearch:scenario registration
-│   │       └── predict.md                         ← /autoresearch:predict registration
+│   │       ├── predict.md                         ← /autoresearch:predict registration
+│   │       └── learn.md                           ← /autoresearch:learn registration
 │   └── skills/
 │       └── autoresearch/
 │           ├── SKILL.md                           ← Main skill (loaded by Claude Code)
@@ -64,6 +65,7 @@ autoresearch/
 │               ├── fix-workflow.md                ← Fix loop protocol
 │               ├── scenario-workflow.md           ← Scenario exploration protocol
 │               ├── predict-workflow.md            ← Multi-persona swarm prediction workflow
+│               ├── learn-workflow.md              ← Learn/documentation engine protocol
 │               └── results-logging.md             ← TSV tracking format
 ├── .claude/                                       ← LOCAL development (gitignored except autoresearch)
 │   ├── commands/autoresearch/                     ← Dev copies of commands
@@ -79,6 +81,7 @@ autoresearch/
 │   ├── autoresearch-ship.md                       ← Shipping workflow
 │   ├── autoresearch-scenario.md                   ← Scenario explorer
 │   ├── autoresearch-predict.md                    ← Multi-persona swarm prediction
+│   ├── autoresearch-learn.md                      ← Documentation engine
 │   ├── chains-and-combinations.md                 ← Multi-command pipelines
 │   ├── examples-by-domain.md                      ← Real-world examples by domain
 │   └── advanced-patterns.md                       ← Guards, MCP, CI/CD, FAQ
@@ -103,6 +106,7 @@ autoresearch/
 | `references/fix-workflow.md` | `/autoresearch:fix` error repair protocol. | Adding fix strategies, anti-patterns, language-specific patterns |
 | `references/scenario-workflow.md` | `/autoresearch:scenario` scenario exploration. | Adding domains, dimensions, output formats |
 | `references/predict-workflow.md` | `/autoresearch:predict` multi-persona swarm prediction workflow (751 lines). | Adding prediction personas, confidence models, output formats |
+| `references/learn-workflow.md` | `/autoresearch:learn` documentation engine protocol. | Adding doc types, validation checks, generation templates |
 | `references/results-logging.md` | TSV log format and reporting rules. | Changing log columns, summary format, reporting intervals |
 | `claude-plugin/commands/autoresearch/*.md` | Sub-command registration files. | Adding new sub-commands (creates the `/autoresearch:name` slash command) |
 | `claude-plugin/.claude-plugin/plugin.json` | Plugin metadata + version. | Version bumps (use `scripts/release.sh`) |

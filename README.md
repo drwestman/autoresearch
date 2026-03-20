@@ -90,6 +90,7 @@ Before looping, Claude performs a one-time setup:
 | `/autoresearch:fix` | Autonomous fix loop — iteratively repair errors until zero remain |
 | `/autoresearch:scenario` | Scenario-driven use case generator — explore situations, edge cases, derivative scenarios |
 | `/autoresearch:predict` | Multi-persona prediction | Pre-analyze code from 5 expert perspectives before acting |
+| `/autoresearch:learn` | Autonomous documentation engine — scout codebase, generate/update docs, validate, fix loop |
 | `Guard: <command>` | Optional safety net — must pass for changes to be kept |
 
 **All commands use `AskUserQuestion` for interactive setup when invoked without arguments.** Just type the command — Claude will ask you what you need step by step with smart defaults based on your codebase. Power users can skip the wizard by providing flags inline.
@@ -112,6 +113,9 @@ Before looping, Claude performs a one-time setup:
 | Stress test a user journey | `/autoresearch:scenario --depth deep` |
 | I want expert opinions before I start | `/autoresearch:predict` |
 | Analyze this from multiple angles | `/autoresearch:predict --chain debug` |
+| Generate docs for a new codebase | `/autoresearch:learn --mode init` |
+| Update existing docs after changes | `/autoresearch:learn --mode update` |
+| Check if docs are stale | `/autoresearch:learn --mode check` |
 
 ---
 
@@ -127,7 +131,7 @@ In Claude Code, run:
 /plugin install autoresearch@autoresearch
 ```
 
-That's it. All 8 commands are available after running `/reload-plugins` or restarting Claude Code.
+That's it. All 9 commands are available after running `/reload-plugins` or restarting Claude Code.
 
 **Updating (no reinstall needed):**
 ```
@@ -275,6 +279,18 @@ Takes a broken state and iteratively repairs it until everything passes. ONE fix
 | `--from-debug` | Read findings from latest debug session |
 
 **Chain them:** Run `/autoresearch:debug` with `Iterations: 15`, then `/autoresearch:fix --from-debug` with `Iterations: 30`
+
+---
+
+## /autoresearch:learn — Autonomous Documentation Engine
+
+Scout codebase → generate docs → validate → fix → repeat. 4 modes: init (create from scratch), update (refresh existing), check (read-only health report), summarize (quick overview).
+
+```
+/autoresearch:learn --mode init --depth deep
+```
+
+Dynamic doc discovery (scans `docs/*.md`), project-type detection, validation-fix loop (max 3 retries), scale-aware scouting, git-diff scoping for updates, selective single-doc update with `--file`.
 
 ---
 
