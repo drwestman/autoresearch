@@ -7,7 +7,7 @@
 Based on [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) — constraint + mechanical metric + autonomous iteration = compounding gains.
 
 [![Claude Code Skill](https://img.shields.io/badge/Claude_Code-Skill-blue?logo=anthropic&logoColor=white)](https://docs.anthropic.com/en/docs/claude-code)
-[![Version](https://img.shields.io/badge/version-1.7.5-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
+[![Version](https://img.shields.io/badge/version-1.7.6-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 [![Based on](https://img.shields.io/badge/Based_on-Karpathy's_Autoresearch-orange)](https://github.com/karpathy/autoresearch)
@@ -369,6 +369,7 @@ Every 10 iterations, Claude prints a progress summary. Bounded loops print a fin
 ```
 autoresearch/
 ├── README.md
+├── COMPARISON.md                                  ← Karpathy's Autoresearch vs Claude Autoresearch
 ├── guide/                                         ← Comprehensive guides — one per command + advanced patterns
 │   ├── README.md                                  ← Guide index
 │   ├── getting-started.md                         ← Installation, core concepts, FAQ
@@ -382,7 +383,19 @@ autoresearch/
 │   ├── autoresearch-predict.md                    ← Multi-persona swarm prediction
 │   ├── chains-and-combinations.md                 ← Multi-command pipelines
 │   ├── examples-by-domain.md                      ← Real-world examples by domain
-│   └── advanced-patterns.md                       ← Guards, MCP, CI/CD, FAQ
+│   ├── advanced-patterns.md                       ← Guards, MCP, CI/CD, FAQ
+│   └── scenario/                                  ← 10 real-world scenario walkthroughs
+│       ├── README.md                              ← Scenario guide index
+│       ├── real-time-chat-messaging.md
+│       ├── multi-tenant-saas-onboarding.md
+│       ├── cicd-pipeline-deployment.md
+│       ├── healthcare-appointment-scheduling.md
+│       ├── social-media-content-moderation.md
+│       ├── iot-firmware-updates.md
+│       ├── document-collaboration.md
+│       ├── cross-border-wire-transfers.md
+│       ├── search-autocomplete.md
+│       └── mobile-push-notifications.md
 ├── LICENSE
 ├── .claude-plugin/
 │   └── marketplace.json                           ← Plugin marketplace manifest (source: ./claude-plugin)
