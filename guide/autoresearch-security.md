@@ -4,7 +4,7 @@
 
 **By [Udit Goenka](https://udit.co)**
 
-[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
+[![Version](https://img.shields.io/badge/version-1.8.1-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
 
 </div>
 

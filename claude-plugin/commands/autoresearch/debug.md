@@ -1,7 +1,7 @@
 ---
 name: autoresearch:debug
 description: Autonomous bug-hunting loop — scientific method + autoresearch iteration. Finds ALL bugs, not just one.
-argument-hint: "[--fix] [--scope <glob>] [--symptom <text>] [--severity <level>] [--iterations N]"
+argument-hint: "[--fix] [--scope <glob>] [--symptom <text>] [--severity <level>] [--technique <name>] [--iterations N]"
 ---
 
 EXECUTE IMMEDIATELY — do not deliberate, do not ask clarifying questions before reading the protocol.
@@ -14,6 +14,7 @@ Extract these from $ARGUMENTS — the user may provide extensive context alongsi
 - `--scope <glob>` or `Scope:` — file globs to investigate
 - `--symptom "<text>"` or `Symptom:` — description of what's broken
 - `--severity <level>` — minimum severity to report (critical/high/medium/low)
+- `--technique <name>` — force a specific investigation technique (binary-search, differential, minimal-reproduction, trace, pattern-search, working-backwards, rubber-duck)
 - `Iterations:` or `--iterations N` — integer for bounded mode (CRITICAL: run exactly N iterations then stop)
 
 If `Iterations: N` or `--iterations N` is found, set `max_iterations = N`. Track `current_iteration` starting at 0. After iteration N, print final summary and STOP.

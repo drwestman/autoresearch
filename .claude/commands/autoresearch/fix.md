@@ -1,7 +1,7 @@
 ---
 name: autoresearch:fix
 description: Autonomous fix loop — iteratively repairs errors until zero remain. One fix per iteration, atomic, auto-reverted on failure.
-argument-hint: "[--target <cmd>] [--guard <cmd>] [--scope <glob>] [--category <type>] [--from-debug] [--iterations N]"
+argument-hint: "[--target <cmd>] [--guard <cmd>] [--scope <glob>] [--category <type>] [--skip-lint] [--from-debug] [--iterations N]"
 ---
 
 EXECUTE IMMEDIATELY — do not deliberate, do not ask clarifying questions before reading the protocol.
@@ -14,6 +14,7 @@ Extract these from $ARGUMENTS — the user may provide extensive context alongsi
 - `--guard <cmd>` or `Guard:` — safety command that must always pass
 - `--scope <glob>` or `Scope:` — file globs to fix
 - `--category <type>` — only fix: test, type, lint, or build
+- `--skip-lint` — skip lint fixes, focus on tests/types/build only
 - `--from-debug` — read findings from latest debug session
 - `Iterations:` or `--iterations N` — integer for bounded mode (CRITICAL: run exactly N iterations then stop)
 

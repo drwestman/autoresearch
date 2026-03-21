@@ -258,7 +258,8 @@ autoresearch/
 │   │       ├── security.md                 ← /autoresearch:security
 │   │       ├── ship.md                     ← /autoresearch:ship
 │   │       ├── scenario.md                 ← /autoresearch:scenario
-│   │       └── predict.md                  ← /autoresearch:predict
+│   │       ├── predict.md                  ← /autoresearch:predict
+│   │       └── learn.md                    ← /autoresearch:learn
 │   └── skills/
 │       └── autoresearch/
 │           ├── SKILL.md                    ← Core skill definition
@@ -272,6 +273,7 @@ autoresearch/
 │               ├── ship-workflow.md
 │               ├── scenario-workflow.md
 │               ├── predict-workflow.md
+│               ├── learn-workflow.md
 │               └── results-logging.md
 ├── guide/                                  ← Comprehensive guides
 │   ├── getting-started.md

@@ -298,7 +298,7 @@ Load: `references/predict-workflow.md` for full protocol.
 | `--rounds N` | Debate rounds (default: 2, range: 1-3) |
 | `--depth <level>` | Depth preset: shallow (3 personas, 1 round), standard (5, 2), deep (8, 3) |
 | `--adversarial` | Use adversarial persona set (Red Team, Blue Team, Insider, Supply Chain, Judge) |
-| `--budget <dollars>` | Max LLM cost for this session (default: $1.00) |
+| `--budget <N>` | Max total findings across all personas (default: 40) |
 | `--fail-on <severity>` | Exit non-zero if findings at or above severity (for CI/CD) |
 | `--scope <glob>` | Limit analysis to specific files |
 
@@ -318,7 +318,7 @@ Scope: src/api/**
 Goal: Pre-deployment quality audit
 
 # CI/CD gate
-/autoresearch:predict --fail-on critical --budget 0.50
+/autoresearch:predict --fail-on critical --budget 20
 Scope: src/**
 Iterations: 1
 
