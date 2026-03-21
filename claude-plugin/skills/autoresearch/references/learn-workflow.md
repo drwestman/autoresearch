@@ -87,7 +87,8 @@ Detect project state for smart defaults:
 **Steps:**
 
 1. Scan codebase, calculate files/LOC per directory
-2. **Exclusion list:** `.claude`, `.opencode`, `.git`, `tests`, `__tests__`, `node_modules`, `__pycache__`, `secrets`, `vendor`, `dist`, `build`, `.next`, `.nuxt`, `coverage`, `generated`, `*.min.js`, `.cache`, `.tmp`
+2. **Exclusion list:** `.claude`, `.opencode`, `.git`, `node_modules`, `__pycache__`, `secrets`, `vendor`, `dist`, `build`, `.next`, `.nuxt`, `coverage`, `generated`, `*.min.js`, `.cache`, `.tmp`
+   - **Test directories (`tests`, `__tests__`) are NOT excluded** — scouts should scan test structure (file patterns, frameworks, fixtures) for testing-guide.md generation. Scouts read test metadata, not individual test logic.
 3. **Scale awareness:**
    - Count total files: `find . -type f -not -path './.git/*' -not -path '*/node_modules/*' | wc -l`
    - If >5000 files: increase scout parallelism, add summarization step for reports
@@ -96,6 +97,13 @@ Detect project state for smart defaults:
 5. **Scout validation:** After scouts return, verify reports contain meaningful data. If all scouts return empty/minimal: STOP → warn: "Scout found minimal code. Verify project has source files or adjust scope with `--scope`."
 6. **Monorepo detection:** Check for `workspaces` in package.json, `lerna.json`, `pnpm-workspace.yaml`, `Cargo.toml` with `[workspace]`. If detected → note workspace structure in context.
 7. Merge scout reports. Estimate token count: `total_report_lines × 5`. If >100K estimated tokens → summarize merged reports before passing downstream.
+
+**Incremental scouting (planned):**
+- If `learn/` output directory exists from a previous run, read `scout-context.md` for cached context
+- Compare `git log --oneline` since the cached scout's commit hash
+- If <20 files changed: use cached scout + targeted re-scout of changed dirs only
+- If >20 files changed or no cache: full scout as normal
+- **Note:** This is optimization scaffolding — full scout is always the fallback
 
 **Update mode optimization — git-diff scoping:**
 - Run `git diff --name-only HEAD~10 -- '*.ts' '*.js' '*.py' '*.go' '*.rs' '*.java' '*.rb' 2>/dev/null | head -30`
@@ -137,6 +145,10 @@ Output: `✓ Phase 2: Analyzed — [type] project, [N] existing docs, staleness:
 - `docs/deployment-guide.md` — if Dockerfile, CI config (`.github/workflows`, `.gitlab-ci.yml`), deploy scripts, or cloud config detected
 - `docs/design-guidelines.md` — if UI components, CSS/style files, or frontend framework detected
 - `docs/project-roadmap.md` — if project has milestones, issues, or TODO tracking
+- `docs/api-reference.md` — if API routes, controllers, resolvers, or OpenAPI/Swagger specs detected. Include endpoint catalog with method, path, description, request/response shapes
+- `docs/testing-guide.md` — if test directories (`tests/`, `__tests__/`, `spec/`), test config (jest.config, vitest.config, pytest.ini), or CI test steps detected. Document test strategy, how to run tests, coverage expectations, fixture patterns
+- `docs/configuration-guide.md` — if `.env.example`, `config/` directory, feature flags, or environment-specific configs detected. Document all env vars, config keys, and their purpose
+- `docs/changelog.md` — generate from `git log --oneline --no-merges -50` using conventional commit parsing. Group by type (feat, fix, docs, refactor). Only on init; update mode appends new entries
 
 ### Update Mode — Read Existing Docs in Parallel
 
@@ -165,6 +177,17 @@ Output: `✓ Phase 2: Analyzed — [type] project, [N] existing docs, staleness:
 8. Merge Explore results into context
 
 **Selective update:** If `--file <name>` provided → scope to that single file only, skip parallel reading.
+
+**Diff-based doc targeting (update mode optimization):**
+- After git-diff scoping identifies changed source files, map them to affected docs:
+  - `src/api/**` changes → prioritize `api-reference.md`, `system-architecture.md`
+  - `src/components/**` changes → prioritize `design-guidelines.md`
+  - `tests/**` changes → prioritize `testing-guide.md`
+  - `package.json` / dependency changes → prioritize `codebase-summary.md` (dependency section)
+  - Config file changes → prioritize `configuration-guide.md`
+  - New files in `src/` → prioritize `code-standards.md`, `system-architecture.md`
+- Instruct docs-manager to focus regeneration effort on mapped docs, light-touch others
+- This is advisory, not exclusive — all docs still get reviewed, mapped ones get deeper updates
 
 ### Check Mode — Inventory Only
 
@@ -210,6 +233,10 @@ Include ALL of the following in the agent prompt:
 8. **Constraint:** README must stay under 300 lines
 9. **Instruction (Init):** "Adapt doc content to the detected project type. Do not generate generic boilerplate."
 10. **Instruction (Update):** "Preserve the user's custom doc structure and content. Update information, don't reorganize."
+11. **Instruction (Mermaid):** "Include Mermaid diagrams in `system-architecture.md` — at minimum: component relationship diagram, data flow diagram, and service dependency graph. Use ```mermaid code blocks. For API projects, add request flow diagrams. For frontends, add component hierarchy."
+12. **Instruction (Dependencies):** "In `codebase-summary.md`, include a **Key Dependencies** section listing the top 10-15 dependencies with: package name, version, purpose (one line), and whether it's a runtime or dev dependency. Parse from package.json/requirements.txt/Cargo.toml."
+13. **Instruction (Cross-references):** "Add 'See also' links between related docs. Example: system-architecture.md should link to api-reference.md for endpoint details, code-standards.md should link to testing-guide.md for test patterns. Use relative markdown links: `[API Reference](api-reference.md)`."
+14. **Instruction (Format):** If `--format` flag is set, output in the specified format instead of Markdown. Currently supported: `markdown` (default). Planned: `confluence`, `rst`, `html`.
 
 ### Additional Requests Passthrough
 
@@ -378,6 +405,7 @@ Write `summary.md` to output directory:
 | `--topics <list>` | Focus summarize on specific topics | all |
 | `--file <name>` | Selective update — target single doc file | all docs |
 | `--no-fix` | Skip validation-fix loop (accept first-pass) | false |
+| `--format <fmt>` | Output format: `markdown` (default). Planned: `confluence`, `rst`, `html` | markdown |
 
 ## Composite Metric
 

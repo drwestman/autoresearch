@@ -64,6 +64,7 @@ If you provide `--mode` plus at least one other flag, setup is skipped entirely 
 | `--scan` | Force fresh scout in summarize mode | false |
 | `--topics <list>` | Focus summarize on specific topics | All |
 | `--no-fix` | Accept first-pass docs, skip validation-fix loop | false |
+| `--format <type>` | Output format: `markdown` (default), `html`, `json`, `rst` | markdown |
 
 ---
 
@@ -87,8 +88,6 @@ Claude pre-scans, then asks 4 questions. Minimum viable usage — just run it an
 
 Scouts the full codebase, creates `docs/project-overview-pdr.md`, `docs/codebase-summary.md`, `docs/code-standards.md`, `docs/system-architecture.md`, and `README.md`. Conditionally adds `docs/deployment-guide.md` (if Dockerfile/CI detected), `docs/design-guidelines.md` (if frontend detected), `docs/project-roadmap.md` (if milestone tracking detected).
 
----
-
 ### 3. Refresh docs after a sprint
 
 ```
@@ -96,8 +95,6 @@ Scouts the full codebase, creates `docs/project-overview-pdr.md`, `docs/codebase
 ```
 
 Reads existing docs in parallel, identifies stale sections based on recent git changes, updates content while preserving your custom structure.
-
----
 
 ### 4. Quick health check before a release
 
@@ -107,8 +104,6 @@ Reads existing docs in parallel, identifies stale sections based on recent git c
 
 Read-only. Returns a health report with staleness status, file sizes, validation warnings, and coverage of core doc types. No files are modified.
 
----
-
 ### 5. Generate a codebase summary only
 
 ```
@@ -116,8 +111,6 @@ Read-only. Returns a health report with staleness status, file sizes, validation
 ```
 
 Creates or refreshes `docs/codebase-summary.md`. Useful for onboarding new team members or sharing a project snapshot.
-
----
 
 ### 6. Scope learning to one module
 
@@ -127,8 +120,6 @@ Creates or refreshes `docs/codebase-summary.md`. Useful for onboarding new team 
 
 Scouts and updates docs for the API module only. Useful when a subsystem has changed significantly and you don't want to re-process the entire codebase.
 
----
-
 ### 7. Update a single document
 
 ```
@@ -136,8 +127,6 @@ Scouts and updates docs for the API module only. Useful when a subsystem has cha
 ```
 
 Targets exactly one file. Reads the current content, re-scouts relevant code, updates that doc only. Fastest path when architecture changed but everything else is current.
-
----
 
 ### 8. Deep documentation with deployment coverage
 
@@ -147,9 +136,23 @@ Targets exactly one file. Reads the current content, re-scouts relevant code, up
 
 Generates all core docs plus `deployment-guide.md`, `design-guidelines.md`, and `project-roadmap.md` regardless of auto-detection signals. Use before a major launch or handoff.
 
----
+### 9. Diff-based targeted update
 
-### 9. Skip the fix loop for a quick pass
+```
+/autoresearch:learn --mode update
+```
+
+When running in `update` mode, Claude automatically diffs existing docs against the current codebase and only regenerates sections that are stale. Files with no relevant code changes are skipped entirely, making updates faster and more precise.
+
+### 10. Generate docs in a different format
+
+```
+/autoresearch:learn --mode init --format rst
+```
+
+Outputs documentation in reStructuredText instead of Markdown. Supports `markdown`, `html`, `json`, and `rst`. Useful for projects using Sphinx or other non-Markdown doc systems.
+
+### 11. Skip the fix loop for a quick pass
 
 ```
 /autoresearch:learn --mode update --no-fix
@@ -157,9 +160,7 @@ Generates all core docs plus `deployment-guide.md`, `design-guidelines.md`, and 
 
 Accepts first-pass generated docs without running the validation-fix loop. Faster, but may leave broken references in place. Good for exploratory updates where you plan to review manually.
 
----
-
-### 10. Focused summary on specific topics
+### 12. Focused summary on specific topics
 
 ```
 /autoresearch:learn --mode summarize --scan --topics "authentication, payments, rate-limiting"
@@ -205,6 +206,34 @@ Where:
 | <70 | Needs work — significant gaps or validation failures |
 
 The score is logged to `learn-results.tsv` so you can track doc health over time.
+
+---
+
+## Conditional Documentation (v1.8.1)
+
+Beyond the 5 core docs, learn auto-detects signals and generates additional docs when relevant:
+
+| Conditional Doc | Detection Signal |
+|----------------|-----------------|
+| `docs/api-reference.md` | API routes, controllers, resolvers, OpenAPI/Swagger specs |
+| `docs/testing-guide.md` | Test directories, test config files, CI test steps |
+| `docs/configuration-guide.md` | `.env.example`, `config/` directory, feature flags |
+| `docs/changelog.md` | Git history (`git log --oneline --no-merges -50`) |
+| `docs/deployment-guide.md` | Dockerfile, CI config, deploy scripts |
+| `docs/design-guidelines.md` | Frontend components, CSS/styling framework |
+| `docs/project-roadmap.md` | Milestone tracking, TODO files, issue references |
+
+### Architecture Diagrams
+
+`system-architecture.md` now includes **Mermaid diagrams** automatically — component relationships, data flow, and dependency graphs rendered as code blocks. No manual diagramming needed.
+
+### Dependency Documentation
+
+`codebase-summary.md` now includes a **Key Dependencies** section listing major libraries/frameworks with their purpose, version, and license.
+
+### Cross-Reference Linking
+
+All generated docs include **"See also"** links between related documents — e.g., `system-architecture.md` links to `api-reference.md` when API routes are documented, and `testing-guide.md` links to `code-standards.md` for test conventions.
 
 ---
 
@@ -286,7 +315,7 @@ Update docs, then open a PR with the changes:
 Update reads existing docs first, then surgically refreshes stale sections while preserving structure and custom additions. Init generates from scratch and ignores existing content.
 
 **Q: What counts as a "core doc"?**
-Five always-created docs: `project-overview-pdr.md`, `codebase-summary.md`, `code-standards.md`, `system-architecture.md`, and `README.md`. Deployment guide, design guidelines, and roadmap are conditional.
+Five always-created docs: `project-overview-pdr.md`, `codebase-summary.md`, `code-standards.md`, `system-architecture.md`, and `README.md`. Deployment guide, design guidelines, and roadmap are conditional. Additional conditional docs are generated when signals are detected — see "Conditional Documentation" below.
 
 **Q: Why does validation still show warnings after the fix loop?**
 Some issues need human judgment — ambiguous broken references, config keys that appear in multiple places. Claude lists them in `summary.md` with recommendations rather than guessing.

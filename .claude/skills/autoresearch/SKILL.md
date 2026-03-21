@@ -379,6 +379,7 @@ Load: `references/learn-workflow.md` for full protocol.
 | `--topics <list>` | Focus summarize on specific topics |
 | `--file <name>` | Selective update — target single doc |
 | `--no-fix` | Skip validation-fix loop |
+| `--format <fmt>` | Output format: markdown (default). Planned: confluence, rst, html |
 
 **Usage:**
 ```
