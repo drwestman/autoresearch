@@ -14,7 +14,7 @@
 
 In March 2026, **[Andrej Karpathy](https://github.com/karpathy)** released [autoresearch](https://github.com/karpathy/autoresearch) — a 630-line Python script that let AI agents autonomously optimize a GPT language model overnight. In 2 days, a single agent ran **700 experiments**, discovered **20 optimizations**, and achieved an **11% speedup** on already-optimized code. The repo hit 26,000 GitHub stars in under a week.
 
-**[Claude Autoresearch](https://github.com/uditgoenka/autoresearch)** by **[Udit Goenka](https://udit.co)** takes Karpathy's core principles — constraint, mechanical metric, autonomous iteration — and generalizes them into a **Claude Code skill system** with 8 commands that work on **any domain**: code, content, marketing, sales, security, DevOps, HR, or anything with a measurable number.
+**[Claude Autoresearch](https://github.com/uditgoenka/autoresearch)** by **[Udit Goenka](https://udit.co)** takes Karpathy's core principles — constraint, mechanical metric, autonomous iteration — and generalizes them into a **Claude Code skill system** with 9 commands that work on **any domain**: code, content, marketing, sales, security, DevOps, HR, or anything with a measurable number.
 
 The philosophy is the same. The scope is radically different.
 
@@ -143,7 +143,7 @@ Claude Autoresearch answers: **all of them.**
 
 ---
 
-## Command Surface: 1 vs 8
+## Command Surface: 1 vs 9
 
 ### Karpathy: One Script, One Way
 
@@ -153,7 +153,7 @@ uv run train.py    # That's it. The entire interface.
 
 Configuration via `program.md` (a markdown file the agent reads for instructions). No flags, no modes, no interactive setup.
 
-### Claude Autoresearch: 8 Specialized Commands
+### Claude Autoresearch: 9 Specialized Commands
 
 | Command | What It Does | Karpathy Equivalent |
 |---------|-------------|---------------------|
@@ -165,6 +165,7 @@ Configuration via `program.md` (a markdown file the agent reads for instructions
 | `/autoresearch:ship` | Universal shipping workflow (9 ship types) | ❌ No equivalent |
 | `/autoresearch:scenario` | Scenario explorer — 12 dimensions, 5 domains | ❌ No equivalent |
 | `/autoresearch:predict` | Multi-persona swarm prediction (5 expert debate) | ❌ No equivalent (Karpathy's vision: "SETI@home for ML") |
+| `/autoresearch:learn` | Autonomous documentation engine — scout, generate, validate, fix | ❌ No equivalent |
 
 ### Command Chaining (Claude Autoresearch Only)
 
@@ -175,6 +176,7 @@ predict → scenario → debug → fix → ship     (full quality pipeline)
 plan → loop → security → ship                 (feature lifecycle)
 debug → fix → ship                             (production incident)
 predict --adversarial → security → fix         (pre-deploy hardening)
+learn → security → ship                        (docs + audit + release)
 ```
 
 Karpathy's autoresearch has no concept of chaining — it's a single continuous loop.
@@ -346,6 +348,7 @@ autoresearch/
 | **Shipping** | ❌ Not supported | ✅ `/autoresearch:ship` — 9 ship types (code, content, marketing, etc.) |
 | **Scenario exploration** | ❌ Not supported | ✅ `/autoresearch:scenario` — 12 dimensions, 5 domains |
 | **Multi-persona analysis** | ❌ Not supported (Karpathy's stated vision) | ✅ `/autoresearch:predict` — 5 expert personas debate before action |
+| **Documentation** | ❌ Not supported | ✅ `/autoresearch:learn` — scout, generate, validate, fix loop |
 | **Command chaining** | ❌ Not supported | ✅ `predict → debug → fix → ship` and many more |
 
 ### Platform & Compatibility
@@ -394,10 +397,13 @@ Takes a seed scenario and generates situations across 12 dimensions: happy path,
 ### 9. Multi-Persona Prediction (`/autoresearch:predict`)
 5 expert personas (Architect, Security Analyst, Performance Engineer, Reliability Engineer, Devil's Advocate) independently analyze code, debate findings, and reach consensus. Chains directly to any other command. This is the closest implementation of Karpathy's stated vision for "SETI@home for ML" — multiple perspectives before action.
 
-### 10. Noise Handling
+### 10. Autonomous Documentation (`/autoresearch:learn`)
+4-mode documentation engine: init (create from scratch), update (refresh existing), check (read-only health report), summarize (quick overview). Scouts codebase, detects project type, generates docs with Mermaid diagrams and cross-references, then validates and iteratively fixes until docs match reality. Auto-generates conditional docs (API reference, testing guide, config guide, changelog) when signals detected.
+
+### 11. Noise Handling
 Real-world metrics fluctuate (benchmark times, Lighthouse scores). Claude Autoresearch supports multi-run verification (run verify 3-5 times, use median), minimum delta thresholds (only keep if improvement exceeds noise floor), and confirmation runs.
 
-### 11. Crash Recovery Protocol
+### 12. Crash Recovery Protocol
 | Failure | Karpathy | Claude Autoresearch |
 |---------|----------|---------------------|
 | Syntax error | Agent may keep iterating on broken code | Fix immediately, don't count as iteration |
@@ -406,7 +412,7 @@ Real-world metrics fluctuate (benchmark times, Lighthouse scores). Claude Autore
 | Infinite loop | Loop hangs indefinitely | Kill after timeout, revert |
 | External dependency | Loop fails | Skip, log, try different approach |
 
-### 12. Stuck Escalation
+### 13. Stuck Escalation
 After 5 consecutive discards, Claude auto-escalates:
 1. Re-reads ALL in-scope files from scratch
 2. Re-reads the original goal statement
@@ -417,10 +423,10 @@ After 5 consecutive discards, Claude auto-escalates:
 
 Karpathy's loop has no stuck detection — it just keeps trying.
 
-### 13. CI/CD Integration
+### 14. CI/CD Integration
 GitHub Actions, GitLab CI, and pre-commit hook examples for automated nightly optimization, security gates on PRs, and auto-fix workflows. None of this exists in Karpathy's version.
 
-### 14. MCP Server Integration
+### 15. MCP Server Integration
 Claude Autoresearch can use any MCP server during the loop — databases (PostgreSQL), analytics platforms, external APIs, Puppeteer/Playwright, Slack, Stripe, Sentry, Cloudflare. This enables real-time data-driven iteration against live systems.
 
 ---
@@ -456,7 +462,7 @@ The cost: it only works for ML training optimization on a single GPU.
 
 > *"Set the GOAL → Claude runs the LOOP → You wake up to results"*
 
-Claude Autoresearch's design trades ML-specific depth for universal breadth. The same 7 principles apply, but scope, metric, and verify are user-defined — making it work for any domain. The 9 subcommands add specialized workflows that don't exist in Karpathy's version:
+Claude Autoresearch's design trades ML-specific depth for universal breadth. The same 7 principles apply, but scope, metric, and verify are user-defined — making it work for any domain. The 10 subcommands (including the core loop) add specialized workflows that don't exist in Karpathy's version:
 
 - **Debugging** and **fixing** are fundamentally different from optimization — they have different loop structures, different success criteria, and different strategies.
 - **Security auditing** is adversarial — it requires threat modeling, not metric improvement.
@@ -481,6 +487,7 @@ The cost: it doesn't directly train models or leverage GPU compute.
 | Exploring edge cases for a feature | **Claude Autoresearch** (`scenario`) |
 | Shipping a PR with confidence | **Claude Autoresearch** (`ship`) |
 | Getting expert opinions before acting | **Claude Autoresearch** (`predict`) |
+| Generating or refreshing project docs | **Claude Autoresearch** (`learn`) |
 | Running overnight ML experiments on H100 | **Karpathy's** |
 | Improving ANY metric in ANY project | **Claude Autoresearch** |
 
@@ -510,7 +517,7 @@ The cost: it doesn't directly train models or leverage GPU compute.
 
 **Karpathy's autoresearch** proved that autonomous iteration works — a 630-line script, one metric, one file, and the discipline to let the agent run. It's a breakthrough demonstration focused on ML training.
 
-**Claude Autoresearch** takes that proof and asks: *what if this worked for everything?* It generalizes the principles into a skill system with 8 specialized commands, interactive setup, guard safety nets, noise handling, crash recovery, and command chaining — all running inside Claude Code on any project, any language, any domain.
+**Claude Autoresearch** takes that proof and asks: *what if this worked for everything?* It generalizes the principles into a skill system with 9 specialized commands, interactive setup, guard safety nets, noise handling, crash recovery, and command chaining — all running inside Claude Code on any project, any language, any domain.
 
 Same philosophy. Same loop. Radically different scope.
 
