@@ -4,13 +4,13 @@
 
 **By [Udit Goenka](https://udit.co)**
 
-[![Version](https://img.shields.io/badge/version-1.8.1-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
+[![Version](https://img.shields.io/badge/version-1.8.2-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
 
 </div>
 
 ---
 
-Comprehensive security audit using STRIDE threat modeling, OWASP Top 10, and red-team adversarial analysis with 4 hostile personas. `/autoresearch:security` doesn't scan for known CVEs and stop — it builds a full threat model of your specific codebase, maps every trust boundary, then iteratively probes each attack vector with code evidence required for every confirmed finding. No theoretical vulnerabilities. Every finding ships with file:line reference, attack scenario, and mitigation.
+Comprehensive security audit
 
 ---
 

@@ -209,7 +209,7 @@ The score is logged to `learn-results.tsv` so you can track doc health over time
 
 ---
 
-## Conditional Documentation (v1.8.1)
+## Conditional Documentation
 
 Beyond the 5 core docs, learn auto-detects signals and generates additional docs when relevant:
 

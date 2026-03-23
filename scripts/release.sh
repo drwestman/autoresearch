@@ -155,6 +155,7 @@ echo "  Before continuing, review these files for accuracy:"
 echo ""
 echo "  README.md        — version refs, command table, feature descriptions"
 echo "  guide/           — individual command guides, examples, advanced patterns"
+echo "  guide/autoresearch-*.md — per-command guides with version badges/refs"
 echo "  guide/scenario/  — scenario guide, domain examples, edge case patterns"
 echo "  CONTRIBUTING.md  — repo structure, file table, sub-command steps"
 echo "  COMPARISON.md    — subcommand count, feature comparison table"
@@ -174,7 +175,7 @@ echo ""
 read -rp "  Press ENTER when docs are ready (or 'skip' to continue as-is): " DOC_RESPONSE
 
 if [[ "$DOC_RESPONSE" != "skip" ]]; then
-  # Check if README or EXAMPLES were modified
+  # Check if README, guide, CONTRIBUTING, or COMPARISON were modified
   if [[ -n "$(git status --porcelain -- README.md guide/ CONTRIBUTING.md COMPARISON.md)" ]]; then
     echo "    Staging doc updates..."
     git add README.md guide/ CONTRIBUTING.md COMPARISON.md 2>/dev/null || true
