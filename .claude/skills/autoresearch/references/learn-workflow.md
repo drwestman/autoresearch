@@ -40,7 +40,7 @@ Iterations: 5
 
 Detect project state for smart defaults:
 1. Does `docs/` exist? How many .md files? `ls docs/*.md 2>/dev/null | wc -l`
-2. Project type indicators: `ls package.json Cargo.toml go.mod pyproject.toml *.sln 2>/dev/null`
+2. Project type indicators: `for f in package.json Cargo.toml go.mod pyproject.toml; do [ -f "$f" ] && echo "$f"; done; ls *.sln 2>/dev/null`
 3. Staleness: `git log -1 --format='%ci' -- docs/ 2>/dev/null` vs `git log -1 --format='%ci' 2>/dev/null`
 4. Scale: `find . -type f -not -path './.git/*' -not -path '*/node_modules/*' | wc -l`
 
@@ -118,7 +118,7 @@ Output: `✓ Phase 1: Scouted — [N] files, [M] directories, [K] LOC analyzed`
 2. Detect **tech stack**: languages, frameworks, build tools, test runners
 3. Detect **existing doc structure:** `ls docs/*.md 2>/dev/null`
 4. Calculate **staleness gap:**
-   - Last code commit: `git log -1 --format='%ci' -- $(git ls-files '*.ts' '*.js' '*.py' '*.go' '*.rs' '*.java' '*.rb' | head -1) 2>/dev/null`
+   - Last code commit: `git log -1 --format='%ci' -- '*.ts' '*.js' '*.py' '*.go' '*.rs' '*.java' '*.rb' 2>/dev/null`
    - Last docs commit: `git log -1 --format='%ci' -- docs/ 2>/dev/null`
    - Gap in days between the two
 
@@ -236,7 +236,7 @@ Include ALL of the following in the agent prompt:
 11. **Instruction (Mermaid):** "Include Mermaid diagrams in `system-architecture.md` — at minimum: component relationship diagram, data flow diagram, and service dependency graph. Use ```mermaid code blocks. For API projects, add request flow diagrams. For frontends, add component hierarchy."
 12. **Instruction (Dependencies):** "In `codebase-summary.md`, include a **Key Dependencies** section listing the top 10-15 dependencies with: package name, version, purpose (one line), and whether it's a runtime or dev dependency. Parse from package.json/requirements.txt/Cargo.toml."
 13. **Instruction (Cross-references):** "Add 'See also' links between related docs. Example: system-architecture.md should link to api-reference.md for endpoint details, code-standards.md should link to testing-guide.md for test patterns. Use relative markdown links: `[API Reference](api-reference.md)`."
-14. **Instruction (Format):** If `--format` flag is set, output in the specified format instead of Markdown. Currently supported: `markdown` (default). Planned: `confluence`, `rst`, `html`.
+14. **Instruction (Format):** If `--format` flag is set, output in the specified format instead of Markdown. Currently supported: `markdown` (default). Planned: `html`, `json`, `rst`.
 
 ### Additional Requests Passthrough
 
@@ -258,8 +258,8 @@ Output: `✓ Phase 4: Generated — [N] docs created/updated`
 
 ### Script Validation
 
-1. Check script exists: `[ -f "$HOME/.claude/scripts/validate-docs.cjs" ]`
-2. If exists: run `node $HOME/.claude/scripts/validate-docs.cjs docs/`
+1. Locate validation script: check `./scripts/validate-docs.cjs`, then `.claude/scripts/validate-docs.cjs`, then `$HOME/.claude/scripts/validate-docs.cjs`
+2. If found: run `node <script_path> docs/`
 3. Checks performed: code references exist, internal links resolve, config keys are real, markdown syntax valid
 4. Display validation report (warnings listed)
 5. If script missing: skip with note "Validation script not found — skipping script validation"

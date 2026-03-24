@@ -56,7 +56,7 @@ You MUST call `AskUserQuestion` with the selected questions in ONE batched call:
 
 Parse inline arguments in this order (flags take precedence over positional text):
 
-1. **Flags first:** Extract `--scope`, `--goal`, `--depth`, `--chain`, `--personas`, `--rounds`, `--adversarial`, `--budget`, `--fail-on`
+1. **Flags first:** Extract `--scope`, `--goal`, `--depth`, `--chain`, `--personas`, `--rounds`, `--adversarial`, `--max-findings`, `--budget` (deprecated alias for `--max-findings`), `--fail-on`
 2. **YAML config block:** Parse `Scope:`, `Goal:`, `Depth:`, `Chain:`, `Personas:`, `Iterations:` key-value pairs
 3. **Remaining text:** Treat as the goal description if not mapped to a flag
 4. **Conflict resolution:** If `--depth standard` is set but `Personas: 8` is also set, explicit `Personas:` wins
@@ -684,7 +684,8 @@ Reports older than 30 days also receive: `⚠️ Age Warning: This report is {N}
 | `--rounds <N>` | Override debate rounds (1-3) | `--rounds 1` |
 | `--adversarial` | Use adversarial persona set instead of default | `--adversarial` |
 | `--chain <tools>` | Chain to downstream tool(s). Comma-separated for multi-chain | `--chain debug` or `--chain scenario,debug,fix` |
-| `--budget <findings>` | Max total findings across all personas (default: 40) | `--budget 20` |
+| `--max-findings <N>` | Max total findings across all personas (default: 40) | `--max-findings 20` |
+| `--budget <N>` | Deprecated alias for `--max-findings`. | `--budget 20` |
 | `--fail-on <severity>` | Exit non-zero if findings at severity exist | `--fail-on critical` |
 | `--incremental` | Re-use existing knowledge files, update only changed | `--incremental` |
 

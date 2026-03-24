@@ -33,7 +33,7 @@ The philosophy is the same. The scope is radically different.
 | **Domain** | ML model training only | Any domain with a measurable metric |
 | **Metric** | val_bpb (validation bits per byte) | Any mechanical metric you define |
 | **Scope** | Single file (train.py) | Any glob pattern (e.g., `src/**/*.ts`) |
-| **Commands** | 1 (run the script) | 8 subcommands + flags |
+| **Commands** | 1 (run the script) | 9 commands (1 core + 8 subcommands + flags) |
 | **Setup** | Manual (edit program.md) | Interactive wizard (`/autoresearch:plan`) |
 | **Hardware** | Requires NVIDIA GPU (H100/A100/RTX) | No special hardware — runs wherever Claude Code runs |
 | **Cost** | GPU compute ($2-5/hour for H100) | Claude API tokens only |
@@ -507,7 +507,7 @@ The cost: it doesn't directly train models or leverage GPU compute.
 
 ### Claude Autoresearch Ecosystem
 - **Claude Code plugin marketplace** — one-command install
-- **8 subcommands** with comprehensive guides
+- **9 subcommands** with comprehensive guides
 - **50+ copy-paste examples** across 12+ domains
 - **CI/CD templates** for GitHub Actions and GitLab CI
 - **MCP server integrations** for databases, analytics, and APIs

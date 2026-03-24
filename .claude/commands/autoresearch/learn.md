@@ -17,12 +17,12 @@ Extract these from $ARGUMENTS — the user may provide extensive context alongsi
 - `--scan` — force fresh scout in summarize mode
 - `--topics <list>` — focus summarize on specific topics
 - `--no-fix` — skip validation-fix loop
-- `--format <fmt>` — output format: markdown (default), html, json, rst
+- `--format <fmt>` — output format: markdown (default); html, json, rst are planned
 - `Iterations:` or `--iterations N` — integer for bounded mode (CRITICAL: run exactly N iterations then stop)
 
 If `Iterations: N` or `--iterations N` is found, set `max_iterations = N`. Track `current_iteration` starting at 0. After iteration N, print final summary and STOP.
 
-All remaining text in $ARGUMENTS is additional context — use it to understand the problem but do not treat it as flags.
+The first non-flag token in `$ARGUMENTS` is the **goal/focus** (e.g., `"document the API layer"`). Any subsequent text is additional context. Use the goal to scope the learn workflow; pass additional context as supplementary instructions.
 
 ## Execution
 

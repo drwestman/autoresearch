@@ -298,7 +298,8 @@ Load: `references/predict-workflow.md` for full protocol.
 | `--rounds N` | Debate rounds (default: 2, range: 1-3) |
 | `--depth <level>` | Depth preset: shallow (3 personas, 1 round), standard (5, 2), deep (8, 3) |
 | `--adversarial` | Use adversarial persona set (Red Team, Blue Team, Insider, Supply Chain, Judge) |
-| `--budget <N>` | Max total findings across all personas (default: 40) |
+| `--max-findings <N>` | Max total findings across all personas (default: 40) |
+| `--budget <N>` | Deprecated alias for `--max-findings`. Kept for backward compatibility; may be removed in a future version. |
 | `--fail-on <severity>` | Exit non-zero if findings at or above severity (for CI/CD) |
 | `--scope <glob>` | Limit analysis to specific files |
 
@@ -318,7 +319,7 @@ Scope: src/api/**
 Goal: Pre-deployment quality audit
 
 # CI/CD gate
-/autoresearch:predict --fail-on critical --budget 20
+/autoresearch:predict --fail-on critical --max-findings 20
 Scope: src/**
 Iterations: 1
 
@@ -592,6 +593,6 @@ See `references/core-principles.md` for the 7 generalizable principles from auto
 | Scenario analysis | Scenario coverage score (higher) | Feature/domain files | `/autoresearch:scenario` | — |
 | Scenarios | Use cases + edge cases + dimension coverage | Target feature/files | `/autoresearch:scenario` | — |
 | Prediction | Findings + hypotheses (higher) | Target files | `/autoresearch:predict` | — |
-| Documentation | Validation pass rate (higher) | `docs/*.md` | `/autoresearch:learn` | `npm test` |
+| Documentation | Validation pass rate (higher) | `docs/*.md` | `/autoresearch:learn` | — |
 
 Adapt the loop to your domain. The PRINCIPLES are universal; the METRICS are domain-specific.

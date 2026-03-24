@@ -1,6 +1,6 @@
 {
   "name": "autoresearch",
-  "description": "Autonomous improvement engine for Claude Code. Runs an unbounded modify-verify-keep/discard loop against any mechanical metric. 8 subcommands: plan, debug, fix, security, ship, scenario, predict, and learn.",
+  "description": "Autonomous improvement engine for Claude Code. Runs an unbounded modify-verify-keep/discard loop against any mechanical metric. 9 subcommands: plan, debug, fix, security, ship, scenario, predict, and learn.",
   "version": "1.8.2",
   "author": {
     "name": "Udit Goenka",
