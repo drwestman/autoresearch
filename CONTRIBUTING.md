@@ -50,7 +50,8 @@ autoresearch/
 │   │       ├── debug.md                           ← /autoresearch:debug registration
 │   │       ├── fix.md                             ← /autoresearch:fix registration
 │   │       ├── scenario.md                        ← /autoresearch:scenario registration
-│   │       └── predict.md                         ← /autoresearch:predict registration
+│   │       ├── predict.md                         ← /autoresearch:predict registration
+│   │       └── learn.md                           ← /autoresearch:learn registration
 │   └── skills/
 │       └── autoresearch/
 │           ├── SKILL.md                           ← Main skill (loaded by Claude Code)
@@ -64,6 +65,7 @@ autoresearch/
 │               ├── fix-workflow.md                ← Fix loop protocol
 │               ├── scenario-workflow.md           ← Scenario exploration protocol
 │               ├── predict-workflow.md            ← Multi-persona swarm prediction workflow
+│               ├── learn-workflow.md              ← Learn/documentation engine protocol
 │               └── results-logging.md             ← TSV tracking format
 ├── .claude/                                       ← LOCAL development (gitignored except autoresearch)
 │   ├── commands/autoresearch/                     ← Dev copies of commands
@@ -79,9 +81,13 @@ autoresearch/
 │   ├── autoresearch-ship.md                       ← Shipping workflow
 │   ├── autoresearch-scenario.md                   ← Scenario explorer
 │   ├── autoresearch-predict.md                    ← Multi-persona swarm prediction
+│   ├── autoresearch-learn.md                      ← Documentation engine
 │   ├── chains-and-combinations.md                 ← Multi-command pipelines
 │   ├── examples-by-domain.md                      ← Real-world examples by domain
-│   └── advanced-patterns.md                       ← Guards, MCP, CI/CD, FAQ
+│   ├── advanced-patterns.md                       ← Guards, MCP, CI/CD, FAQ
+│   └── scenario/                                  ← Scenario-specific guides
+│       └── README.md                              ← Scenario guide index
+├── COMPARISON.md                                  ← Feature comparison with alternatives
 ├── CONTRIBUTING.md                                ← You are here
 ├── LICENSE                                        ← MIT License
 └── scripts/
@@ -103,11 +109,14 @@ autoresearch/
 | `references/fix-workflow.md` | `/autoresearch:fix` error repair protocol. | Adding fix strategies, anti-patterns, language-specific patterns |
 | `references/scenario-workflow.md` | `/autoresearch:scenario` scenario exploration. | Adding domains, dimensions, output formats |
 | `references/predict-workflow.md` | `/autoresearch:predict` multi-persona swarm prediction workflow (751 lines). | Adding prediction personas, confidence models, output formats |
+| `references/learn-workflow.md` | `/autoresearch:learn` documentation engine protocol. | Adding doc types, validation checks, generation templates |
 | `references/results-logging.md` | TSV log format and reporting rules. | Changing log columns, summary format, reporting intervals |
 | `claude-plugin/commands/autoresearch/*.md` | Sub-command registration files. | Adding new sub-commands (creates the `/autoresearch:name` slash command) |
 | `claude-plugin/.claude-plugin/plugin.json` | Plugin metadata + version. | Version bumps (use `scripts/release.sh`) |
 | `README.md` | Public overview, commands table, quick start. | Adding features, updating commands, documenting changes |
 | `guide/*.md` | Individual command guides, examples, advanced patterns. | Adding scenarios, command combinations, domain examples |
+| `guide/scenario/` | Scenario-specific guides and domain examples. | Adding scenario domains, edge case patterns |
+| `COMPARISON.md` | Feature comparison with alternatives. | Updating subcommand count, adding new capabilities to comparison table |
 
 ## What to Contribute
 
@@ -184,7 +193,9 @@ We use [conventional commits](https://www.conventionalcommits.org/):
    - `SKILL.md` — register sub-commands, update activation triggers
    - `README.md` — commands table, quick decision guide, repo structure, FAQ
    - `guide/` — add individual command guide or update existing ones
+   - `guide/scenario/` — update scenario guides if adding new domains or patterns
    - `guide/examples-by-domain.md` — add copy-paste examples for new features
+   - `COMPARISON.md` — update subcommand count and feature comparison table
 6. **Don't bump the version.** Maintainers handle version bumps via `scripts/release.sh`.
 7. **Keep files focused.** Don't modify files unrelated to your change.
 
@@ -252,8 +263,10 @@ Add to the interactive setup gate table.
 | Doc | What to Update |
 |-----|---------------|
 | `README.md` | Commands table, Quick Decision Guide, dedicated section, repo structure, FAQ |
-| `GUIDE.md` | Command Reference section, relevant domain scenarios, chain patterns |
-| `EXAMPLES.md` | Add examples section for the new command |
+| `guide/` | Individual command guide, chains-and-combinations, examples-by-domain, advanced-patterns |
+| `guide/scenario/` | Scenario guide chain suggestions (if relevant to scenario workflows) |
+| `COMPARISON.md` | Update subcommand count and feature comparison table |
+| `CONTRIBUTING.md` | Repo structure tree, "What Each File Does" table |
 
 ## Testing Your Changes
 

@@ -110,7 +110,7 @@ iteration	commit	metric	delta	guard	status	description
 | metric | float | Measured value from verification |
 | delta | float | Change from previous best (negative = improved for "lower is better") |
 | guard | enum | `pass`, `fail`, or `-` (no guard configured) |
-| status | enum | `baseline`, `keep`, `discard`, `crash` |
+| status | enum | `baseline`, `keep`, `keep (reworked)`, `discard`, `crash`, `no-op`, `hook-blocked` |
 | description | string | One-sentence description of what was tried |
 
 ### Example

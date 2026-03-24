@@ -4,7 +4,7 @@
 
 **By [Udit Goenka](https://udit.co)**
 
-[![Version](https://img.shields.io/badge/version-1.7.5-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
+[![Version](https://img.shields.io/badge/version-1.8.2-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
@@ -38,9 +38,11 @@ Everything you need to master autonomous iteration — from first run to advance
 | [/autoresearch:ship](autoresearch-ship.md) | Universal shipping workflow — 9 ship types |
 | [/autoresearch:scenario](autoresearch-scenario.md) | Scenario explorer — 12 dimensions, 5 domains |
 | [/autoresearch:predict](autoresearch-predict.md) | Multi-persona swarm prediction — expert debate before action |
+| [/autoresearch:learn](autoresearch-learn.md) | Autonomous documentation engine — scout, learn, generate, validate, fix |
 | [Chains & Combinations](chains-and-combinations.md) | Multi-command pipelines and chain patterns |
 | [Examples by Domain](examples-by-domain.md) | Real-world examples: software, sales, marketing, DevOps, ML, HR |
 | [Advanced Patterns](advanced-patterns.md) | Guards, MCP servers, CI/CD, custom scripts, FAQ |
+| **[Scenario Guides](scenario/)** | **10 real-world scenario walkthroughs — chat, SaaS, CI/CD, healthcare, finance, IoT, and more** |
 
 ---
 
@@ -62,6 +64,10 @@ Everything you need to master autonomous iteration — from first run to advance
 | Stress test a user journey | `/autoresearch:scenario --depth deep` |
 | I want expert opinions before I start | `/autoresearch:predict` |
 | Analyze this from multiple angles | `/autoresearch:predict --chain debug` |
+| Generate docs for a new codebase | `/autoresearch:learn --mode init` |
+| Update existing docs after changes | `/autoresearch:learn --mode update` |
+| Check if docs are stale or broken | `/autoresearch:learn --mode check` |
+| Quick codebase summary | `/autoresearch:learn --mode summarize` |
 
 ---
 

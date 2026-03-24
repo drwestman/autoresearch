@@ -7,7 +7,7 @@
 Based on [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) — constraint + mechanical metric + autonomous iteration = compounding gains.
 
 [![Claude Code Skill](https://img.shields.io/badge/Claude_Code-Skill-blue?logo=anthropic&logoColor=white)](https://docs.anthropic.com/en/docs/claude-code)
-[![Version](https://img.shields.io/badge/version-1.7.5-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
+[![Version](https://img.shields.io/badge/version-1.8.2-blue.svg)](https://github.com/uditgoenka/autoresearch/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 [![Based on](https://img.shields.io/badge/Based_on-Karpathy's_Autoresearch-orange)](https://github.com/karpathy/autoresearch)
@@ -90,6 +90,7 @@ Before looping, Claude performs a one-time setup:
 | `/autoresearch:fix` | Autonomous fix loop — iteratively repair errors until zero remain |
 | `/autoresearch:scenario` | Scenario-driven use case generator — explore situations, edge cases, derivative scenarios |
 | `/autoresearch:predict` | Multi-persona prediction | Pre-analyze code from 5 expert perspectives before acting |
+| `/autoresearch:learn` | Autonomous documentation engine — scout codebase, generate/update docs, validate, fix loop |
 | `Guard: <command>` | Optional safety net — must pass for changes to be kept |
 
 **All commands use `AskUserQuestion` for interactive setup when invoked without arguments.** Just type the command — Claude will ask you what you need step by step with smart defaults based on your codebase. Power users can skip the wizard by providing flags inline.
@@ -112,6 +113,9 @@ Before looping, Claude performs a one-time setup:
 | Stress test a user journey | `/autoresearch:scenario --depth deep` |
 | I want expert opinions before I start | `/autoresearch:predict` |
 | Analyze this from multiple angles | `/autoresearch:predict --chain debug` |
+| Generate docs for a new codebase | `/autoresearch:learn --mode init` |
+| Update existing docs after changes | `/autoresearch:learn --mode update` |
+| Check if docs are stale | `/autoresearch:learn --mode check` |
 
 ---
 
@@ -127,7 +131,7 @@ In Claude Code, run:
 /plugin install autoresearch@autoresearch
 ```
 
-That's it. All 8 commands are available after running `/reload-plugins` or restarting Claude Code.
+That's it. All 9 commands are available after running `/reload-plugins` or restarting Claude Code.
 
 **Updating (no reinstall needed):**
 ```
@@ -278,6 +282,18 @@ Takes a broken state and iteratively repairs it until everything passes. ONE fix
 
 ---
 
+## /autoresearch:learn — Autonomous Documentation Engine
+
+Scout codebase → generate docs → validate → fix → repeat. 4 modes: init (create from scratch), update (refresh existing), check (read-only health report), summarize (quick overview).
+
+```
+/autoresearch:learn --mode init --depth deep
+```
+
+Dynamic doc discovery (scans `docs/*.md`), project-type detection, validation-fix loop (max 3 retries), scale-aware scouting, git-diff scoping for updates, selective single-doc update with `--file`. Auto-generates Mermaid architecture diagrams, conditional docs (API reference, testing guide, config guide, changelog), cross-reference links between docs, and dependency documentation. Supports `--format` for alternative output formats.
+
+---
+
 ## /autoresearch:predict — Multi-Persona Prediction (v1.7.0)
 
 Before you debug, fix, or ship — get 5 expert perspectives in 2 minutes.
@@ -369,6 +385,7 @@ Every 10 iterations, Claude prints a progress summary. Bounded loops print a fin
 ```
 autoresearch/
 ├── README.md
+├── COMPARISON.md                                  ← Karpathy's Autoresearch vs Claude Autoresearch
 ├── guide/                                         ← Comprehensive guides — one per command + advanced patterns
 │   ├── README.md                                  ← Guide index
 │   ├── getting-started.md                         ← Installation, core concepts, FAQ
@@ -380,9 +397,22 @@ autoresearch/
 │   ├── autoresearch-ship.md                       ← Shipping workflow
 │   ├── autoresearch-scenario.md                   ← Scenario explorer
 │   ├── autoresearch-predict.md                    ← Multi-persona swarm prediction
+│   ├── autoresearch-learn.md                      ← Documentation engine
 │   ├── chains-and-combinations.md                 ← Multi-command pipelines
 │   ├── examples-by-domain.md                      ← Real-world examples by domain
-│   └── advanced-patterns.md                       ← Guards, MCP, CI/CD, FAQ
+│   ├── advanced-patterns.md                       ← Guards, MCP, CI/CD, FAQ
+│   └── scenario/                                  ← 10 real-world scenario walkthroughs
+│       ├── README.md                              ← Scenario guide index
+│       ├── real-time-chat-messaging.md
+│       ├── multi-tenant-saas-onboarding.md
+│       ├── cicd-pipeline-deployment.md
+│       ├── healthcare-appointment-scheduling.md
+│       ├── social-media-content-moderation.md
+│       ├── iot-firmware-updates.md
+│       ├── document-collaboration.md
+│       ├── cross-border-wire-transfers.md
+│       ├── search-autocomplete.md
+│       └── mobile-push-notifications.md
 ├── LICENSE
 ├── .claude-plugin/
 │   └── marketplace.json                           ← Plugin marketplace manifest (source: ./claude-plugin)
@@ -398,7 +428,8 @@ autoresearch/
 │   │       ├── debug.md                           ← /autoresearch:debug registration
 │   │       ├── fix.md                             ← /autoresearch:fix registration
 │   │       ├── scenario.md                        ← /autoresearch:scenario registration
-│   │       └── predict.md                         ← /autoresearch:predict registration
+│   │       ├── predict.md                         ← /autoresearch:predict registration
+│   │       └── learn.md                           ← /autoresearch:learn registration
 │   └── skills/
 │       └── autoresearch/
 │           ├── SKILL.md                           ← Main skill (loaded by Claude Code)
@@ -412,6 +443,7 @@ autoresearch/
 │               ├── fix-workflow.md                ← Fix loop protocol
 │               ├── scenario-workflow.md           ← Scenario exploration protocol
 │               ├── predict-workflow.md            ← Multi-persona swarm prediction workflow
+│               ├── learn-workflow.md              ← Documentation engine protocol
 │               └── results-logging.md             ← TSV tracking format
 ```
 

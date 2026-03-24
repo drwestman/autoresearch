@@ -38,7 +38,7 @@ In Claude Code, run:
 /plugin install autoresearch@autoresearch
 ```
 
-Then run `/reload-plugins` or restart Claude Code. All 7 commands are immediately available.
+Then run `/reload-plugins` or restart Claude Code. All 9 commands are immediately available.
 
 ### Option B — Manual Install (Project-Level)
 

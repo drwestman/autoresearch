@@ -21,6 +21,10 @@ The real power of autoresearch comes from chaining commands together. Each comma
 | `scenario → security` | Threat modeling from user scenarios |
 | `fix → loop → ship` | Fix blockers, then improve, then deploy |
 | `predict → scenario,debug,fix,ship` | Full quality pipeline |
+| `learn → security` | New codebase: document it, then audit it |
+| `learn → predict` | Document, then get multi-expert analysis |
+| `learn:check → learn:update` | Check health first, update if stale |
+| `learn → scenario` | Document, then stress-test edge cases |
 
 ---
 
@@ -295,6 +299,41 @@ Goal: Full quality pipeline before release
 6. **Ship** — Deploy with confidence, informed by all prior stages
 
 **Time estimate:** Full pipeline ~ 2-3 hours for a medium codebase
+
+---
+
+### The Learn Pipeline
+
+Documentation is the foundation — learn the codebase first, then chain to specialized commands.
+
+**Learn → Security:**
+
+```
+/autoresearch:learn --mode init --depth deep
+/autoresearch:security
+Iterations: 15
+```
+
+First pass: generate comprehensive docs. Second pass: security audit uses the docs as context to find blind spots faster.
+
+**Learn → Predict → Debug:**
+
+```
+/autoresearch:learn --mode update
+/autoresearch:predict --chain debug
+```
+
+Update docs, then predict issues from multiple expert angles, then debug the most likely ones.
+
+**Check → Update (Conditional):**
+
+```
+/autoresearch:learn --mode check
+# If report says "Stale" or "Needs attention":
+/autoresearch:learn --mode update
+```
+
+Lightweight health check before committing to a full update cycle. Saves time when docs are already fresh.
 
 ---
 

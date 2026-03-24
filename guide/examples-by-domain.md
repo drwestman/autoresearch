@@ -2,7 +2,7 @@
 
 Copy-paste configurations organized by domain. Every example includes the command, config, and what Claude does. All verification commands are real — paste them into your project and adjust paths as needed.
 
-[Software Engineering](#software-engineering-typescriptjavascript) · [Python & Django](#python--django) · [Go](#go) · [Rust](#rust) · [Sales & Lead Generation](#sales--lead-generation) · [SEO & Content Marketing](#seo--content-marketing) · [Marketing & Growth](#marketing--growth) · [Web Scraping & Data Collection](#web-scraping--data-collection) · [Research & Analysis](#research--analysis) · [DevOps & Infrastructure](#devops--infrastructure) · [Data Science & ML](#data-science--ml) · [Design & Accessibility](#design--accessibility) · [HR & People Operations](#hr--people-operations) · [Operations](#operations) · [MCP Servers](#combining-with-mcp-servers) · [CI/CD Integration](#cicd-integration) · [Verification Scripts](#custom-verification-scripts)
+[Software Engineering](#software-engineering-typescriptjavascript) · [Python & Django](#python--django) · [Go](#go) · [Rust](#rust) · [Sales & Lead Generation](#sales--lead-generation) · [SEO & Content Marketing](#seo--content-marketing) · [Marketing & Growth](#marketing--growth) · [Web Scraping & Data Collection](#web-scraping--data-collection) · [Research & Analysis](#research--analysis) · [DevOps & Infrastructure](#devops--infrastructure) · [Data Science & ML](#data-science--ml) · [Design & Accessibility](#design--accessibility) · [HR & People Operations](#hr--people-operations) · [Operations](#operations) · [Documentation & Knowledge Management](#documentation--knowledge-management) · [MCP Servers](#combining-with-mcp-servers) · [CI/CD Integration](#cicd-integration) · [Verification Scripts](#custom-verification-scripts)
 
 ---
 
@@ -1013,6 +1013,36 @@ Scope: docs/incident-playbooks/*.md
 Metric: completeness checklist score (higher is better)
 Verify: node scripts/playbook-completeness.js
 ```
+
+---
+
+## Documentation & Knowledge Management
+
+### Generate docs for an unknown codebase
+
+```
+/autoresearch:learn --mode init --depth deep
+Scope: src/**
+```
+
+Claude scouts the codebase, detects project type (web app, library, CLI, API), generates all relevant docs (architecture, code standards, overview, summary), validates references, and iteratively fixes any hallucinated code refs. Creates deployment-guide.md only if Dockerfile/CI config detected.
+
+### Update docs after a major refactor
+
+```
+/autoresearch:learn --mode update
+Iterations: 3
+```
+
+Uses git-diff scoping to prioritize changed areas. Reads existing docs in parallel, updates all `docs/*.md` dynamically (no hardcoded list — catches custom docs too). Validation-fix loop ensures updated refs are valid.
+
+### Check documentation health
+
+```
+/autoresearch:learn --mode check
+```
+
+Read-only diagnostic: staleness gap (days between last code commit vs last docs commit), validation warnings, file inventory with LOC, coverage assessment. No files modified.
 
 ---
 
