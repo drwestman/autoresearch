@@ -131,7 +131,9 @@ In Claude Code, run:
 /plugin install autoresearch@autoresearch
 ```
 
-That's it. All 9 commands are available after running `/reload-plugins` or restarting Claude Code.
+That's it. All 9 commands are available after restarting Claude Code.
+
+> **Note:** Start a new Claude Code session after installing. Reference files aren't resolvable in the same session where installation happened — this is a Claude Code platform limitation.
 
 **Updating (no reinstall needed):**
 ```
