@@ -101,10 +101,11 @@ if [[ ${#DIVERGED[@]} -gt 0 ]]; then
     echo "    $F"
   done
   echo ""
-  echo "These files are supposed to be identical. Releasing with diverged files may cause inconsistencies."
-  read -rp "Continue anyway? [y/N] " CONFIRM
+  echo "These files are supposed to be identical. Step [3/7] will auto-sync them from claude-plugin/ to copilot-plugin/."
+  echo "Any manual edits made directly in copilot-plugin/ for these shared files will be overwritten."
+  read -rp "Continue? [y/N] " CONFIRM
   if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
-    echo "Release aborted. Sync the files and retry."
+    echo "Release aborted. Sync the files manually and retry, or continue to let the script auto-sync."
     exit 1
   fi
 fi
@@ -173,7 +174,8 @@ done
 
 # --- Sync distribution files from .claude/ to claude-plugin/ ---
 echo ""
-echo "[3/7] Syncing distribution files to claude-plugin/"
+echo "[3/7] Syncing distribution files"
+echo "  → claude-plugin/ (from .claude/ source of truth)"
 if [[ -d ".claude/commands/autoresearch" ]]; then
   cp .claude/commands/autoresearch.md claude-plugin/commands/autoresearch.md
   cp .claude/commands/autoresearch/*.md claude-plugin/commands/autoresearch/
@@ -184,6 +186,21 @@ if [[ -d ".claude/skills/autoresearch" ]]; then
   cp .claude/skills/autoresearch/references/*.md claude-plugin/skills/autoresearch/references/
   echo "    Synced claude-plugin/skills/autoresearch/"
 fi
+
+# Sync shared reference files from claude-plugin/ to copilot-plugin/.
+# copilot-plugin/ is its own source of truth (no .copilot/ dev dir), but these 8
+# reference files are intentionally identical between both plugins. We propagate
+# them from claude-plugin/ (which was just updated from .claude/) so a single edit
+# in .claude/ flows to both distributions atomically.
+echo "  → copilot-plugin/references/ (shared refs only)"
+for REF in "${SHARED_REFS[@]}"; do
+  SRC="claude-plugin/$REF"
+  DST="copilot-plugin/$REF"
+  if [[ -f "$SRC" && -f "$DST" ]]; then
+    cp "$SRC" "$DST"
+  fi
+done
+echo "    Synced shared references to copilot-plugin/skills/autoresearch/references/"
 
 # --- Doc review prompt ---
 echo ""
