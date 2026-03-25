@@ -687,8 +687,8 @@ jobs:
         with:
           fetch-depth: 0  # Full history for delta mode
 
-      - name: Install Copilot CLI
-        run: npm install -g @github/copilot
+      - name: Install GitHub Copilot extension
+        run: gh extension install github/gh-copilot
 
       - name: Install Autoresearch Skill
         run: |
