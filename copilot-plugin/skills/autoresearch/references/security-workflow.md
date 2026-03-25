@@ -581,7 +581,7 @@ Exit with non-zero code if findings meet or exceed a severity threshold. Designe
 **CI/CD usage:**
 ```bash
 # In GitHub Actions or CI scripts
-claude -p "/autoresearch:security --fail-on critical --iterations 10"
+gh copilot suggest "/autoresearch:security --fail-on critical --iterations 10"
 # Exit code 1 if any Critical findings → blocks the pipeline
 ```
 
@@ -694,18 +694,18 @@ jobs:
         run: |
           git clone https://github.com/uditgoenka/autoresearch.git /tmp/autoresearch
           cp -r /tmp/autoresearch/copilot-plugin/skills/autoresearch ~/.copilot/skills/autoresearch
-          cp -r /tmp/autoresearch/commands/autoresearch .claude/commands/autoresearch
-          cp /tmp/autoresearch/commands/autoresearch.md .claude/commands/autoresearch.md
+          cp -r /tmp/autoresearch/copilot-plugin/commands/autoresearch ~/.copilot/commands/autoresearch
+          cp /tmp/autoresearch/copilot-plugin/commands/autoresearch.md ~/.copilot/commands/autoresearch.md
 
       - name: Run Security Audit
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Delta mode on PRs, full audit on schedule
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            claude -p "/autoresearch:security --diff --fail-on critical --iterations 5"
+            gh copilot suggest "/autoresearch:security --diff --fail-on critical --iterations 5"
           else
-            claude -p "/autoresearch:security --fail-on high --iterations 15"
+            gh copilot suggest "/autoresearch:security --fail-on high --iterations 15"
           fi
 
       - name: Upload Security Report

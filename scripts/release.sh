@@ -73,6 +73,42 @@ if git tag -l "$TAG" | grep -q "$TAG"; then
   exit 1
 fi
 
+# --- Check shared reference files are in sync ---
+SHARED_REFS=(
+  "skills/autoresearch/references/core-principles.md"
+  "skills/autoresearch/references/debug-workflow.md"
+  "skills/autoresearch/references/fix-workflow.md"
+  "skills/autoresearch/references/learn-workflow.md"
+  "skills/autoresearch/references/predict-workflow.md"
+  "skills/autoresearch/references/results-logging.md"
+  "skills/autoresearch/references/scenario-workflow.md"
+  "skills/autoresearch/references/ship-workflow.md"
+)
+DIVERGED=()
+for REF in "${SHARED_REFS[@]}"; do
+  CLAUDE_FILE="claude-plugin/$REF"
+  COPILOT_FILE="copilot-plugin/$REF"
+  if [[ -f "$CLAUDE_FILE" && -f "$COPILOT_FILE" ]]; then
+    if ! diff -q "$CLAUDE_FILE" "$COPILOT_FILE" > /dev/null 2>&1; then
+      DIVERGED+=("$REF")
+    fi
+  fi
+done
+if [[ ${#DIVERGED[@]} -gt 0 ]]; then
+  echo ""
+  echo "⚠️  WARNING: The following shared reference files have diverged between claude-plugin and copilot-plugin:"
+  for F in "${DIVERGED[@]}"; do
+    echo "    $F"
+  done
+  echo ""
+  echo "These files are supposed to be identical. Releasing with diverged files may cause inconsistencies."
+  read -rp "Continue anyway? [y/N] " CONFIRM
+  if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
+    echo "Release aborted. Sync the files and retry."
+    exit 1
+  fi
+fi
+
 # Read current version
 CURRENT=$(grep -o '"version": "[^"]*"' "$PLUGIN_JSON" | cut -d'"' -f4)
 echo ""
