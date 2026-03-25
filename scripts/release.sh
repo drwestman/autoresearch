@@ -39,6 +39,7 @@ VERSION="${VERSION#v}"
 TAG="v${VERSION}"
 BRANCH="release/${VERSION}"
 PLUGIN_JSON="claude-plugin/.claude-plugin/plugin.json"
+COPILOT_PLUGIN_JSON="copilot-plugin/.claude-plugin/plugin.json"
 MARKETPLACE_JSON=".claude-plugin/marketplace.json"
 
 # --- Preflight checks ---
@@ -88,7 +89,7 @@ git checkout -b "$BRANCH"
 
 # --- Bump version in plugin.json and marketplace.json ---
 echo "[2/7] Bumping versions: $CURRENT → $VERSION"
-for JSON_FILE in "$PLUGIN_JSON" "$MARKETPLACE_JSON"; do
+for JSON_FILE in "$PLUGIN_JSON" "$COPILOT_PLUGIN_JSON" "$MARKETPLACE_JSON"; do
   if [[ -f "$JSON_FILE" ]]; then
     echo "    Updating $JSON_FILE"
     if [[ "$(uname)" == "Darwin" ]]; then
@@ -100,15 +101,16 @@ for JSON_FILE in "$PLUGIN_JSON" "$MARKETPLACE_JSON"; do
 done
 
 # --- Bump version in distribution SKILL.md ---
-DIST_SKILL="claude-plugin/skills/autoresearch/SKILL.md"
-if [[ -f "$DIST_SKILL" ]] && grep -q "^version:" "$DIST_SKILL"; then
-  echo "    Updating $DIST_SKILL"
-  if [[ "$(uname)" == "Darwin" ]]; then
-    sed -i '' "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
-  else
-    sed -i "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
+for DIST_SKILL in "claude-plugin/skills/autoresearch/SKILL.md" "copilot-plugin/skills/autoresearch/SKILL.md"; do
+  if [[ -f "$DIST_SKILL" ]] && grep -q "^version:" "$DIST_SKILL"; then
+    echo "    Updating $DIST_SKILL"
+    if [[ "$(uname)" == "Darwin" ]]; then
+      sed -i '' "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
+    else
+      sed -i "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
+    fi
   fi
-fi
+done
 
 # --- Bump version in SKILL.md frontmatter ---
 SKILL_FILE=".claude/skills/autoresearch/SKILL.md"
