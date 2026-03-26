@@ -24,14 +24,18 @@
 [1/7] Create release branch (release/X.Y.Z)
 [2/7] Bump versions:
       → claude-plugin/.claude-plugin/plugin.json  (version field)
+      → copilot-plugin/.claude-plugin/plugin.json (version field)
       → .claude-plugin/marketplace.json           (version fields — top-level + plugins array)
       → .claude/skills/autoresearch/SKILL.md      (version frontmatter)
+      → claude-plugin/skills/autoresearch/SKILL.md
+      → copilot-plugin/skills/autoresearch/SKILL.md
       → README.md                                 (version badge)
       → guide/README.md                           (version badge)
 [3/7] Sync distribution files:
-      → Copies .claude/commands/autoresearch/ → claude-plugin/commands/autoresearch/
-      → Copies .claude/skills/autoresearch/  → claude-plugin/skills/autoresearch/
-      → Ensures claude-plugin/ distribution matches .claude/ source of truth
+      → claude-plugin/: copies .claude/commands/ and .claude/skills/ (full sync)
+      → copilot-plugin/: copies 8 shared reference files from claude-plugin/
+        (autonomous-loop-protocol, plan-workflow, and security-workflow are
+         copilot-unique — they are NOT overwritten)
 [4/7] Pause for doc review:
       → Shows changelog since last tag
       → Prompts you to review README.md, guide/, CONTRIBUTING.md
@@ -52,6 +56,8 @@ Before running the script, verify:
 - [ ] No uncommitted changes in working tree
 - [ ] You're on the `master` branch
 - [ ] `gh` CLI is authenticated
+- [ ] If editing copilot-unique reference files (`autonomous-loop-protocol.md`, `plan-workflow.md`, `security-workflow.md`), edits are in `copilot-plugin/` directly
+- [ ] If editing shared reference files, edits are in `.claude/skills/autoresearch/references/` (not in `copilot-plugin/` directly)
 
 ## Doc Review Guide
 
@@ -92,13 +98,15 @@ At step [4/7], the script pauses and shows the changelog. Review these files:
 
 ## Distribution Sync
 
-The `claude-plugin/` directory is the **distribution package** — what Claude Code downloads when users install the plugin. The `.claude/` versions are the development source of truth.
+### Claude Plugin
+
+The `claude-plugin/` directory is the **distribution package** for Claude Code. The `.claude/` versions are the development source of truth.
 
 **Why `claude-plugin/` and not root?** Claude Code's plugin caching downloads the `source` directory. If `source` is `"./"` (the entire repo), the cached plugin contains its own `.claude-plugin/marketplace.json`, causing Claude Code to recursively cache the plugin inside itself — hitting macOS's 1024-char path limit (`ENAMETOOLONG`). Pointing `source` to `./claude-plugin` (an isolated distribution directory without `marketplace.json`) breaks this recursion.
 
 **Before every release**, the script syncs `claude-plugin/` from `.claude/`:
 ```bash
-# What the sync step does:
+# What the claude sync step does:
 cp .claude/commands/autoresearch.md claude-plugin/commands/autoresearch.md
 cp .claude/commands/autoresearch/*.md claude-plugin/commands/autoresearch/
 cp .claude/skills/autoresearch/SKILL.md claude-plugin/skills/autoresearch/SKILL.md
@@ -106,6 +114,35 @@ cp .claude/skills/autoresearch/references/*.md claude-plugin/skills/autoresearch
 ```
 
 If you add a new subcommand during development, it goes into `.claude/` first. The release script ensures `claude-plugin/` stays in sync.
+
+### Copilot Plugin
+
+The `copilot-plugin/` directory is **both the development source and the distribution package**. There is no separate source directory (unlike `claude-plugin/` which is derived from `.claude/`).
+
+For local development, symlink `copilot-plugin/` into your Copilot CLI config directory:
+```bash
+ln -s $(pwd)/copilot-plugin/skills/autoresearch ~/.copilot/skills/autoresearch
+ln -s $(pwd)/copilot-plugin/commands/autoresearch ~/.copilot/commands/autoresearch
+ln -s $(pwd)/copilot-plugin/commands/autoresearch.md ~/.copilot/commands/autoresearch.md
+```
+
+**Shared vs. copilot-unique reference files:**
+
+| File | Shared? | Notes |
+|------|---------|-------|
+| `core-principles.md` | ✅ Shared | Auto-synced from `claude-plugin/` at release |
+| `debug-workflow.md` | ✅ Shared | Auto-synced from `claude-plugin/` at release |
+| `fix-workflow.md` | ✅ Shared | Auto-synced from `claude-plugin/` at release |
+| `learn-workflow.md` | ✅ Shared | Auto-synced from `claude-plugin/` at release |
+| `predict-workflow.md` | ✅ Shared | Auto-synced from `claude-plugin/` at release |
+| `results-logging.md` | ✅ Shared | Auto-synced from `claude-plugin/` at release |
+| `scenario-workflow.md` | ✅ Shared | Auto-synced from `claude-plugin/` at release |
+| `ship-workflow.md` | ✅ Shared | Auto-synced from `claude-plugin/` at release |
+| `autonomous-loop-protocol.md` | ❌ Unique | Has Copilot CLI Launch Gate — edit in `copilot-plugin/` |
+| `plan-workflow.md` | ❌ Unique | Has `exit_plan_mode` at Phase 7 — edit in `copilot-plugin/` |
+| `security-workflow.md` | ❌ Unique | Copilot-specific differences — edit in `copilot-plugin/` |
+
+**Rule:** When editing shared reference files, edit them in `.claude/skills/autoresearch/references/`. The release script propagates the change to both `claude-plugin/` and `copilot-plugin/` automatically. When editing copilot-unique files, edit them directly in `copilot-plugin/`.
 
 ## Abort and Resume
 
@@ -129,3 +166,5 @@ git checkout master && git branch -D release/X.Y.Z
 | Forgot to update docs | Edit on the PR branch, push, then merge |
 | "Tag already exists" | Choose a different version number |
 | ENAMETOOLONG on install | Ensure `marketplace.json` has `"source": "./claude-plugin"` (not `"./"`) |
+| Shared ref edit lost in copilot-plugin | Edits to shared refs must go in `.claude/`, not `copilot-plugin/` — the script overwrites them |
+| Copilot-unique file accidentally overwritten | Those 3 files are not in `SHARED_REFS` — if overwritten, restore from git: `git checkout HEAD -- copilot-plugin/skills/autoresearch/references/<file>` |

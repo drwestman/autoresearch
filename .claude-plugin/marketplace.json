@@ -10,13 +10,24 @@
   "plugins": [
     {
       "name": "autoresearch",
-      "description": "Autonomous improvement engine: /autoresearch runs an unlimited modify-verify-keep/discard loop. Includes /autoresearch:plan (goal wizard), /autoresearch:predict (multi-persona swarm prediction), /autoresearch:security (STRIDE + OWASP audit), /autoresearch:ship (multi-phase delivery workflow), /autoresearch:debug (autonomous bug hunter), /autoresearch:fix (autonomous error crusher), /autoresearch:scenario (edge case explorer), and /autoresearch:learn (autonomous documentation engine).",
+      "description": "Autonomous improvement engine for Claude Code: /autoresearch runs an unlimited modify-verify-keep/discard loop. Includes /autoresearch:plan (goal wizard), /autoresearch:predict (multi-persona swarm prediction), /autoresearch:security (STRIDE + OWASP audit), /autoresearch:ship (multi-phase delivery workflow), /autoresearch:debug (autonomous bug hunter), /autoresearch:fix (autonomous error crusher), /autoresearch:scenario (edge case explorer), and /autoresearch:learn (autonomous documentation engine).",
       "version": "1.8.2",
       "author": {
         "name": "Udit Goenka",
         "url": "https://github.com/uditgoenka"
       },
       "source": "./claude-plugin",
+      "category": "productivity"
+    },
+    {
+      "name": "autoresearch-copilot",
+      "description": "Autonomous improvement engine for Copilot CLI: integrates with plan mode and autopilot mode. /autoresearch runs an unlimited modify-verify-keep/discard loop. Includes /autoresearch:plan (goal wizard with plan mode), /autoresearch:predict, /autoresearch:security, /autoresearch:ship, /autoresearch:debug, /autoresearch:fix, /autoresearch:scenario, and /autoresearch:learn.",
+      "version": "1.8.2",
+      "author": {
+        "name": "David Westman",
+        "url": "https://github.com/drwestman"
+      },
+      "source": "./copilot-plugin",
       "category": "productivity"
     }
   ]
