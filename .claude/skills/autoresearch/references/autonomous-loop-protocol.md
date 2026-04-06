@@ -736,6 +736,7 @@ Track two values across iterations:
 
 ```
 best_metric       = baseline metric from iteration 0
+best_iteration    = 0
 iterations_since_best = 0
 plateau_patience  = 15  (default, configurable via Plateau-Patience: N)
 ```
@@ -745,6 +746,7 @@ Update after every iteration where a valid metric was extracted:
 ```
 IF new_metric is better than best_metric (respecting Direction):
     best_metric = new_metric
+    best_iteration = current_iteration
     iterations_since_best = 0
 ELSE:
     iterations_since_best += 1
@@ -795,7 +797,7 @@ Set `Plateau-Patience: off` to disable plateau detection entirely and restore th
 
 ## Communication
 
-- **DO NOT** ask "should I keep going?" — in unbounded mode, keep iterating unless plateau detection fires. In bounded mode, continue until N is reached.
+- **DO NOT** ask "should I keep going?" — in unbounded mode, keep iterating unless a halt condition fires (plateau detection, two consecutive metric-errors). In bounded mode, continue until N is reached.
 - **DO NOT** summarize after each iteration — just log and continue
 - **DO** print a brief one-line status every ~5 iterations (e.g., "Iteration 25: metric at 0.95, 8 keeps / 17 discards")
 - **DO** alert if you discover something surprising or game-changing
