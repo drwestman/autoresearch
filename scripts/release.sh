@@ -39,7 +39,6 @@ VERSION="${VERSION#v}"
 TAG="v${VERSION}"
 BRANCH="release/${VERSION}"
 PLUGIN_JSON="claude-plugin/.claude-plugin/plugin.json"
-COPILOT_PLUGIN_JSON="copilot-plugin/.claude-plugin/plugin.json"
 MARKETPLACE_JSON=".claude-plugin/marketplace.json"
 
 # --- Preflight checks ---
@@ -73,43 +72,6 @@ if git tag -l "$TAG" | grep -q "$TAG"; then
   exit 1
 fi
 
-# --- Check shared reference files are in sync ---
-SHARED_REFS=(
-  "skills/autoresearch/references/core-principles.md"
-  "skills/autoresearch/references/debug-workflow.md"
-  "skills/autoresearch/references/fix-workflow.md"
-  "skills/autoresearch/references/learn-workflow.md"
-  "skills/autoresearch/references/predict-workflow.md"
-  "skills/autoresearch/references/results-logging.md"
-  "skills/autoresearch/references/scenario-workflow.md"
-  "skills/autoresearch/references/ship-workflow.md"
-)
-DIVERGED=()
-for REF in "${SHARED_REFS[@]}"; do
-  CLAUDE_FILE="claude-plugin/$REF"
-  COPILOT_FILE="copilot-plugin/$REF"
-  if [[ -f "$CLAUDE_FILE" && -f "$COPILOT_FILE" ]]; then
-    if ! diff -q "$CLAUDE_FILE" "$COPILOT_FILE" > /dev/null 2>&1; then
-      DIVERGED+=("$REF")
-    fi
-  fi
-done
-if [[ ${#DIVERGED[@]} -gt 0 ]]; then
-  echo ""
-  echo "⚠️  WARNING: The following shared reference files have diverged between claude-plugin and copilot-plugin:"
-  for F in "${DIVERGED[@]}"; do
-    echo "    $F"
-  done
-  echo ""
-  echo "These files are supposed to be identical. Step [3/7] will auto-sync them from claude-plugin/ to copilot-plugin/."
-  echo "Any manual edits made directly in copilot-plugin/ for these shared files will be overwritten."
-  read -rp "Continue? [y/N] " CONFIRM
-  if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
-    echo "Release aborted. Sync the files manually and retry, or continue to let the script auto-sync."
-    exit 1
-  fi
-fi
-
 # Read current version
 CURRENT=$(grep -o '"version": "[^"]*"' "$PLUGIN_JSON" | cut -d'"' -f4)
 echo ""
@@ -126,7 +88,7 @@ git checkout -b "$BRANCH"
 
 # --- Bump version in plugin.json and marketplace.json ---
 echo "[2/7] Bumping versions: $CURRENT → $VERSION"
-for JSON_FILE in "$PLUGIN_JSON" "$COPILOT_PLUGIN_JSON" "$MARKETPLACE_JSON"; do
+for JSON_FILE in "$PLUGIN_JSON" "$MARKETPLACE_JSON"; do
   if [[ -f "$JSON_FILE" ]]; then
     echo "    Updating $JSON_FILE"
     if [[ "$(uname)" == "Darwin" ]]; then
@@ -138,16 +100,15 @@ for JSON_FILE in "$PLUGIN_JSON" "$COPILOT_PLUGIN_JSON" "$MARKETPLACE_JSON"; do
 done
 
 # --- Bump version in distribution SKILL.md ---
-for DIST_SKILL in "claude-plugin/skills/autoresearch/SKILL.md" "copilot-plugin/skills/autoresearch/SKILL.md"; do
-  if [[ -f "$DIST_SKILL" ]] && grep -q "^version:" "$DIST_SKILL"; then
-    echo "    Updating $DIST_SKILL"
-    if [[ "$(uname)" == "Darwin" ]]; then
-      sed -i '' "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
-    else
-      sed -i "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
-    fi
+DIST_SKILL="claude-plugin/skills/autoresearch/SKILL.md"
+if [[ -f "$DIST_SKILL" ]] && grep -q "^version:" "$DIST_SKILL"; then
+  echo "    Updating $DIST_SKILL"
+  if [[ "$(uname)" == "Darwin" ]]; then
+    sed -i '' "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
+  else
+    sed -i "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
   fi
-done
+fi
 
 # --- Bump version in SKILL.md frontmatter ---
 SKILL_FILE=".claude/skills/autoresearch/SKILL.md"
@@ -174,8 +135,7 @@ done
 
 # --- Sync distribution files from .claude/ to claude-plugin/ ---
 echo ""
-echo "[3/7] Syncing distribution files"
-echo "  → claude-plugin/ (from .claude/ source of truth)"
+echo "[3/7] Syncing distribution files to claude-plugin/"
 if [[ -d ".claude/commands/autoresearch" ]]; then
   cp .claude/commands/autoresearch.md claude-plugin/commands/autoresearch.md
   cp .claude/commands/autoresearch/*.md claude-plugin/commands/autoresearch/
@@ -187,21 +147,6 @@ if [[ -d ".claude/skills/autoresearch" ]]; then
   echo "    Synced claude-plugin/skills/autoresearch/"
 fi
 
-# Sync shared reference files from claude-plugin/ to copilot-plugin/.
-# copilot-plugin/ is its own source of truth (no .copilot/ dev dir), but these 8
-# reference files are intentionally identical between both plugins. We propagate
-# them from claude-plugin/ (which was just updated from .claude/) so a single edit
-# in .claude/ flows to both distributions atomically.
-echo "  → copilot-plugin/references/ (shared refs only)"
-for REF in "${SHARED_REFS[@]}"; do
-  SRC="claude-plugin/$REF"
-  DST="copilot-plugin/$REF"
-  if [[ -f "$SRC" && -f "$DST" ]]; then
-    cp "$SRC" "$DST"
-  fi
-done
-echo "    Synced shared references to copilot-plugin/skills/autoresearch/references/"
-
 # --- Doc review prompt ---
 echo ""
 echo "[4/7] Documentation review"
@@ -210,7 +155,6 @@ echo "  Before continuing, review these files for accuracy:"
 echo ""
 echo "  README.md        — version refs, command table, feature descriptions"
 echo "  guide/           — individual command guides, examples, advanced patterns"
-echo "  guide/autoresearch-*.md — per-command guides with version badges/refs"
 echo "  guide/scenario/  — scenario guide, domain examples, edge case patterns"
 echo "  CONTRIBUTING.md  — repo structure, file table, sub-command steps"
 echo "  COMPARISON.md    — subcommand count, feature comparison table"
@@ -230,7 +174,7 @@ echo ""
 read -rp "  Press ENTER when docs are ready (or 'skip' to continue as-is): " DOC_RESPONSE
 
 if [[ "$DOC_RESPONSE" != "skip" ]]; then
-  # Check if README, guide, CONTRIBUTING, or COMPARISON were modified
+  # Check if README or EXAMPLES were modified
   if [[ -n "$(git status --porcelain -- README.md guide/ CONTRIBUTING.md COMPARISON.md)" ]]; then
     echo "    Staging doc updates..."
     git add README.md guide/ CONTRIBUTING.md COMPARISON.md 2>/dev/null || true

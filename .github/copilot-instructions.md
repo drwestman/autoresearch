@@ -85,6 +85,10 @@ scripts/
 - `claude-plugin/` command files reference `.claude/skills/autoresearch/references/`
 - `copilot-plugin/` command files reference `.copilot/skills/autoresearch/references/`
 
+**Development source of truth:**
+- For the **Claude plugin**: edit files in `.claude/skills/autoresearch/` and `.claude/commands/autoresearch/`. The `claude-plugin/` directory is a **derived distribution** — the release script syncs from `.claude/` into `claude-plugin/` automatically. Do not edit `claude-plugin/` directly.
+- For the **Copilot plugin**: `copilot-plugin/` is both the dev source and the distribution. Edit it directly.
+
 ## What to Edit and When
 
 When editing behavior, **update the file in BOTH plugins** (or make the change in `claude-plugin/` and copy to `copilot-plugin/`):
@@ -94,7 +98,7 @@ When editing behavior, **update the file in BOTH plugins** (or make the change i
 | Change the core loop (phases, rules, git memory) | `references/autonomous-loop-protocol.md` | Same |
 | Change the planning wizard | `references/plan-workflow.md` | Same |
 | Change Copilot CLI plan/autopilot mode wiring | n/a | `references/plan-workflow.md` Phase 7 + `autonomous-loop-protocol.md` Launch Gate |
-| Change security audit behavior | `references/security-workflow.md` | Same |
+| Change security audit behavior | `references/security-workflow.md` | `copilot-plugin/` directly (copilot-unique) |
 | Change shipping checklist or ship types | `references/ship-workflow.md` | Same |
 | Change debug investigation techniques | `references/debug-workflow.md` | Same |
 | Change how errors are fixed | `references/fix-workflow.md` | Same |
@@ -105,6 +109,17 @@ When editing behavior, **update the file in BOTH plugins** (or make the change i
 | Add a new sub-command | Create `commands/autoresearch/<name>.md` + reference file + SKILL.md routing | Mirror in copilot-plugin/ |
 | Bump version | Use `./scripts/release.sh` — do not hand-edit version numbers | Handled automatically |
 | Update user-facing docs | `guide/` — one file per command | |
+
+**When adding a new sub-command**, update ALL of these:
+1. `.claude/skills/autoresearch/references/<name>-workflow.md` — full protocol
+2. `.claude/commands/autoresearch/<name>.md` — thin registration wrapper
+3. `.claude/skills/autoresearch/SKILL.md` — subcommands table + routing + setup gate table
+4. `copilot-plugin/` — mirror all three of the above
+5. `README.md` — commands table, Quick Decision Guide, dedicated section, repo structure, FAQ
+6. `guide/autoresearch-<name>.md` — user-facing guide
+7. `guide/chains-and-combinations.md`, `guide/examples-by-domain.md`, `guide/advanced-patterns.md`
+8. `CONTRIBUTING.md` — repo structure tree, "What Each File Does" table
+9. `COMPARISON.md` — subcommand count + feature table
 
 ## Key Conventions
 
@@ -122,6 +137,15 @@ When editing behavior, **update the file in BOTH plugins** (or make the change i
 **Copilot CLI Mode Integration:** The `copilot-plugin/` uses `exit_plan_mode` at two points:
 1. `plan-workflow.md` Phase 7 — presents the autoresearch config as a plan, `autopilot` recommended
 2. `autonomous-loop-protocol.md` Launch Gate — transitions to autopilot before the loop starts
+
+**Shared vs. copilot-unique reference files:** 8 reference files are identical between both plugins and are auto-synced from `claude-plugin/` at release. 3 files are copilot-unique and must be edited directly in `copilot-plugin/`:
+
+| File | Status | Notes |
+|------|--------|-------|
+| `autonomous-loop-protocol.md` | ❌ Copilot-unique | Has Copilot CLI Launch Gate |
+| `plan-workflow.md` | ❌ Copilot-unique | Has `exit_plan_mode` at Phase 7 |
+| `security-workflow.md` | ❌ Copilot-unique | Has Copilot-specific differences |
+| All other `references/*.md` | ✅ Shared | Edit in `.claude/skills/autoresearch/references/` — synced automatically |
 
 **Mechanical metrics only:** The loop only accepts metrics extractable as a float via a shell command (`grep`, `awk`, `jq`). Subjective assessments are not valid metrics. This constraint applies to all sub-commands that produce a measurable output.
 
