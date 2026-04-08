@@ -255,7 +255,7 @@ autoresearch:reason --chain plan,fix          # converge → implement
 
 ## 8 Critical Rules
 
-1. **Loop until done** — unbounded: forever. Bounded: N times then summarize.
+1. **Loop until done** — unbounded: no preset cap; stop on success, plateau detection, or repeated metric errors. Bounded: N times then summarize.
 2. **Read before write** — understand full context before modifying.
 3. **One change per iteration** — atomic changes. If it breaks, you know why.
 4. **Mechanical verification only** — no subjective "looks good." Use metrics.
@@ -271,11 +271,11 @@ autoresearch:reason --chain plan,fix          # converge → implement
 Every iteration is logged in TSV format:
 
 ```tsv
-iteration  commit   metric  delta   status    description
-0          a1b2c3d  85.2    0.0     baseline  initial state
-1          b2c3d4e  87.1    +1.9    keep      add tests for auth edge cases
-2          -        86.5    -0.6    discard   refactor test helpers (broke 2 tests)
-3          c3d4e5f  88.3    +1.2    keep      add error handling tests
+iteration  commit   metric  delta   guard   guard-metric  result_status  description
+0          a1b2c3d  85.2    0.0     pass    0.0           baseline       initial state
+1          b2c3d4e  87.1    +1.9    pass    0.0           keep           add tests for auth edge cases
+2          -        86.5    -0.6    fail    2.0           discard        refactor test helpers (broke 2 tests)
+3          -        -       -       pass    0.0           metric-error   add error handling tests
 ```
 
 ---

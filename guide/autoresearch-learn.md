@@ -64,7 +64,7 @@ If you provide `--mode` plus at least one other flag, setup is skipped entirely 
 | `--scan` | Force fresh scout in summarize mode | false |
 | `--topics <list>` | Focus summarize on specific topics | All |
 | `--no-fix` | Accept first-pass docs, skip validation-fix loop | false |
-| `--format <type>` | Output format: `markdown` (default), `html`, `json`, `rst` | markdown |
+| `--format <type>` | Output format (currently only `markdown` is supported; `html`, `json`, `rst` planned) | markdown |
 
 ---
 

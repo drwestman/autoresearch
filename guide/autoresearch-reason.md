@@ -74,7 +74,7 @@ On rounds 2+, Author-A is replaced with "Author-A'" — a new cold-start agent t
 
 ### Phase 3: Critic
 
-A fresh agent receives only version A and the task. No authorship context. Produces a structured attack: minimum 3 weaknesses, each with a specific claim about why it fails relative to the task. Critic constraints:
+A fresh agent receives **only version A** — no task description, no authorship context. This is the context isolation invariant: the critic must not see the task to prevent task-anchoring. Produces a structured attack: minimum 3 weaknesses, each with a specific claim about why A fails on its own merits. Critic constraints:
 
 - Attack arguments, not purpose — the task itself is never criticized
 - Each weakness must be falsifiable: "claim X is unsupported" not "this feels weak"

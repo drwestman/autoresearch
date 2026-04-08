@@ -1,6 +1,6 @@
 {
   "name": "autoresearch-copilot",
-  "description": "Autonomous improvement engine for Copilot CLI. Runs an unbounded modify-verify-keep/discard loop against any mechanical metric. Integrates with Copilot plan mode and autopilot mode. 10 subcommands: plan, debug, fix, security, ship, scenario, predict, learn, and reason.",
+  "description": "Autonomous improvement engine for Copilot CLI. Runs an unbounded modify-verify-keep/discard loop against any mechanical metric. Integrates with Copilot plan mode and autopilot mode. 9 subcommands: plan, debug, fix, security, ship, scenario, predict, learn, and reason.",
   "version": "1.9.0",
   "author": {
     "name": "David Westman",

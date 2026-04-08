@@ -39,6 +39,7 @@ VERSION="${VERSION#v}"
 TAG="v${VERSION}"
 BRANCH="release/${VERSION}"
 PLUGIN_JSON="claude-plugin/.claude-plugin/plugin.json"
+COPILOT_PLUGIN_JSON="copilot-plugin/.claude-plugin/plugin.json"
 MARKETPLACE_JSON=".claude-plugin/marketplace.json"
 
 # --- Preflight checks ---
@@ -88,7 +89,7 @@ git checkout -b "$BRANCH"
 
 # --- Bump version in plugin.json and marketplace.json ---
 echo "[2/7] Bumping versions: $CURRENT → $VERSION"
-for JSON_FILE in "$PLUGIN_JSON" "$MARKETPLACE_JSON"; do
+for JSON_FILE in "$PLUGIN_JSON" "$COPILOT_PLUGIN_JSON" "$MARKETPLACE_JSON"; do
   if [[ -f "$JSON_FILE" ]]; then
     echo "    Updating $JSON_FILE"
     if [[ "$(uname)" == "Darwin" ]]; then
@@ -107,6 +108,16 @@ if [[ -f "$DIST_SKILL" ]] && grep -q "^version:" "$DIST_SKILL"; then
     sed -i '' "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
   else
     sed -i "s/^version: .*/version: $VERSION/" "$DIST_SKILL"
+  fi
+fi
+
+COPILOT_DIST_SKILL="copilot-plugin/skills/autoresearch/SKILL.md"
+if [[ -f "$COPILOT_DIST_SKILL" ]] && grep -q "^version:" "$COPILOT_DIST_SKILL"; then
+  echo "    Updating $COPILOT_DIST_SKILL"
+  if [[ "$(uname)" == "Darwin" ]]; then
+    sed -i '' "s/^version: .*/version: $VERSION/" "$COPILOT_DIST_SKILL"
+  else
+    sed -i "s/^version: .*/version: $VERSION/" "$COPILOT_DIST_SKILL"
   fi
 fi
 
@@ -174,7 +185,7 @@ echo ""
 read -rp "  Press ENTER when docs are ready (or 'skip' to continue as-is): " DOC_RESPONSE
 
 if [[ "$DOC_RESPONSE" != "skip" ]]; then
-  # Check if README or EXAMPLES were modified
+  # Check if README, guide, CONTRIBUTING, or COMPARISON were modified
   if [[ -n "$(git status --porcelain -- README.md guide/ CONTRIBUTING.md COMPARISON.md)" ]]; then
     echo "    Staging doc updates..."
     git add README.md guide/ CONTRIBUTING.md COMPARISON.md 2>/dev/null || true

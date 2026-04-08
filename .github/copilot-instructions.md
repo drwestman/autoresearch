@@ -138,14 +138,14 @@ When editing behavior, **update the file in BOTH plugins** (or make the change i
 1. `plan-workflow.md` Phase 7 — presents the autoresearch config as a plan, `autopilot` recommended
 2. `autonomous-loop-protocol.md` Launch Gate — transitions to autopilot before the loop starts
 
-**Shared vs. copilot-unique reference files:** 8 reference files are identical between both plugins and are auto-synced from `claude-plugin/` at release. 3 files are copilot-unique and must be edited directly in `copilot-plugin/`:
+**Shared vs. copilot-unique reference files:** 8 reference files are intended to stay identical between both plugins, but they are **not** auto-synced by the release script. When you change a shared reference file, update `claude-plugin/` and mirror the same change into `copilot-plugin/`. 3 files are copilot-unique and must be edited directly in `copilot-plugin/`:
 
 | File | Status | Notes |
 |------|--------|-------|
 | `autonomous-loop-protocol.md` | ❌ Copilot-unique | Has Copilot CLI Launch Gate |
 | `plan-workflow.md` | ❌ Copilot-unique | Has `exit_plan_mode` at Phase 7 |
 | `security-workflow.md` | ❌ Copilot-unique | Has Copilot-specific differences |
-| All other `references/*.md` | ✅ Shared | Edit in `.claude/skills/autoresearch/references/` — synced automatically |
+| All other `references/*.md` | ✅ Shared | Keep `claude-plugin/` and `copilot-plugin/` copies identical; copy changes manually |
 
 **Mechanical metrics only:** The loop only accepts metrics extractable as a float via a shell command (`grep`, `awk`, `jq`). Subjective assessments are not valid metrics. This constraint applies to all sub-commands that produce a measurable output.
 

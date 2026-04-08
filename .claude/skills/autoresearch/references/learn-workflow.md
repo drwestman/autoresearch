@@ -118,7 +118,7 @@ Output: `✓ Phase 1: Scouted — [N] files, [M] directories, [K] LOC analyzed`
 2. Detect **tech stack**: languages, frameworks, build tools, test runners
 3. Detect **existing doc structure:** `ls docs/*.md 2>/dev/null`
 4. Calculate **staleness gap:**
-   - Last code commit: `git log -1 --format='%ci' -- $(git ls-files '*.ts' '*.js' '*.py' '*.go' '*.rs' '*.java' '*.rb' | head -1) 2>/dev/null`
+   - Last code commit: `git log -1 --format='%ci' -- '*.ts' '*.js' '*.py' '*.go' '*.rs' '*.java' '*.rb' 2>/dev/null`
    - Last docs commit: `git log -1 --format='%ci' -- docs/ 2>/dev/null`
    - Gap in days between the two
 
