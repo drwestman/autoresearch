@@ -134,7 +134,7 @@ Targets exactly one file. Reads the current content, re-scouts relevant code, up
 /autoresearch:learn --mode init --depth deep
 ```
 
-Runs a more comprehensive pass that generates all core docs and is more likely to include deployment, design, and roadmap docs when project signals indicate they're relevant. Use before a major launch or handoff.
+Generates all core docs plus `deployment-guide.md`, `design-guidelines.md`, and `project-roadmap.md` regardless of auto-detection signals. Use before a major launch or handoff.
 
 ### 9. Diff-based targeted update
 
@@ -209,7 +209,7 @@ The score is logged to `learn-results.tsv` so you can track doc health over time
 
 ---
 
-## Conditional Documentation
+## Conditional Documentation (v1.8.1)
 
 Beyond the 5 core docs, learn auto-detects signals and generates additional docs when relevant:
 

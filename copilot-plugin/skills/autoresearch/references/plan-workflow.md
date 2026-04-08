@@ -97,13 +97,17 @@ Ask if the user wants a guard command to prevent regressions:
 
 ```
 AskUserQuestion:
-  question: "Do you want a guard command? This is a safety net that must ALWAYS pass — it prevents breaking existing behavior while optimizing."
+  question: "Do you want a guard command? This is a safety net that prevents breaking existing behavior while optimizing."
   header: "Guard"
   options:
     - label: "Yes — run tests as guard (Recommended)"
       description: "{detected_test_command} must pass for every kept change"
     - label: "Yes — custom guard"
       description: "I'll provide my own guard command"
+    - label: "Yes — line count guard to prevent bloat"
+      description: "Reject changes that grow total lines in scope beyond baseline + 10%"
+    - label: "Yes — metric-valued guard with threshold"
+      description: "Track a number (e.g. bundle size) and reject if it regresses beyond a tolerance"
     - label: "No guard needed"
       description: "Skip — the metric is enough (e.g., test coverage where tests ARE the metric)"
 ```
@@ -112,8 +116,32 @@ AskUserQuestion:
 - If metric is performance/benchmark/bundle size → suggest `{test_command}` as guard
 - If metric is Lighthouse/accessibility → suggest `{test_command}` as guard
 - If metric is refactoring (LOC reduction) → suggest `{test_command} && {typecheck_command}` as guard
+- If goal mentions simplification but metric measures something else → suggest "Line count guard to prevent bloat"
 - If metric IS tests (coverage, pass count) → suggest "No guard needed" as default
 - If no test runner detected → suggest "No guard needed" with note
+
+**If line count guard chosen:** Construct a guard command with a ceiling (baseline + 10%):
+```bash
+{test_command} && [ $(find {scope} -name '*.{ext}' | xargs wc -l | tail -1 | awk '{print $1}') -le {baseline_lines_plus_10pct} ]
+```
+
+**If metric-valued guard chosen:** Collect direction and threshold in one follow-up question:
+```
+AskUserQuestion:
+  question: "Configure the guard-metric threshold:"
+  header: "Guard threshold"
+  options:
+    - label: "Lower is better, 5% tolerance (e.g. bundle size)"
+      description: "Reject if guard-metric grows more than 5% from baseline"
+    - label: "Higher is better, 5% tolerance (e.g. coverage)"
+      description: "Reject if guard-metric drops more than 5% from baseline"
+    - label: "Strict — 0% tolerance"
+      description: "Guard-metric must never worsen from baseline"
+    - label: "Custom"
+      description: "I'll specify direction and tolerance"
+```
+
+Dry-run the guard command to validate it outputs a number. Record the guard-metric baseline.
 
 **Guard validation:** If guard is set, run it once to confirm it passes on current codebase. If it fails, help user fix it before proceeding.
 
@@ -156,27 +184,38 @@ AskUserQuestion:
 
 1. **Dry run** the verify command on current codebase
 2. Confirm it exits with code 0
-3. Confirm output contains a parseable number
+3. **Extract the metric and validate it is a number** — the final output of the pipeline must match the pattern `^-?[0-9]+\.?[0-9]*$` (integer or decimal, optional leading minus). Anything else is a failure: strings like `"PASS"`, `"85.2%"`, `"342ms"`, empty output, or multi-line output all fail this check.
 4. Record the baseline metric value
 5. If dry run fails → show error, ask user to fix, re-validate
 
 ```
 Dry run result:
   Exit code: {0 or error}
-  Output snippet: {relevant line}
-  Extracted metric: {number}
+  Raw output (last 3 lines): {tail of verify output}
+  Extracted value: {whatever the pipeline produced}
+  Numeric check: ✓ valid number / ✗ not a number — {what was returned}
   Baseline: {number}
   Status: ✓ VALID / ✗ INVALID — {reason}
 ```
 
-**Do not proceed if verify command fails dry run.** Help user fix it.
+**Common dry-run failures and fixes:**
+
+| Extracted Value | Problem | Fix |
+|---|---|---|
+| `85.2%` | Trailing `%` | Add `\| tr -d '%'` to pipeline |
+| `342ms` | Trailing unit | Add `\| grep -oE '[0-9]+\.?[0-9]*'` |
+| *(empty)* | grep matched nothing | Check the grep pattern against actual output |
+| `All files \| 85.2 \| ...` | awk field wrong | Adjust awk field index or add more specific grep |
+| Two numbers on separate lines | Pipeline too broad | Add `head -1` or tighten grep |
+
+**Do not proceed if verify command fails dry run.** Help user fix the pipeline until it produces a single valid number.
 
 ### Phase 7: Confirm & Launch
 
-Build the complete configuration summary:
+Present the complete configuration:
 
 ```markdown
-## Autoresearch Configuration ✓
+## Autoresearch Configuration
 
 **Goal:** {user's goal}
 **Scope:** {glob pattern}
