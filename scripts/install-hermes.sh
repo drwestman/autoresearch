@@ -12,10 +12,65 @@
 set -euo pipefail
 
 # --- Configuration ---
-HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+normalize_path() {
+  local input="$1"
+  local part
+  local path="$input"
+  local -a raw_parts=()
+  local -a normalized_parts=()
+
+  if [[ "$path" == ~* ]]; then
+    path="$HOME${path:1}"
+  fi
+
+  if [[ "$path" != /* ]]; then
+    path="$PWD/$path"
+  fi
+
+  IFS='/' read -r -a raw_parts <<< "$path"
+  for part in "${raw_parts[@]}"; do
+    case "$part" in
+      ''|'.')
+        ;;
+      '..')
+        if (( ${#normalized_parts[@]} > 0 )); then
+          unset 'normalized_parts[${#normalized_parts[@]}-1]'
+        fi
+        ;;
+      *)
+        normalized_parts+=("$part")
+        ;;
+    esac
+  done
+
+  if (( ${#normalized_parts[@]} == 0 )); then
+    printf '/\n'
+  else
+    printf '/%s\n' "$(IFS=/; echo "${normalized_parts[*]}")"
+  fi
+}
+
+RAW_HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+HERMES_HOME="$(normalize_path "$RAW_HERMES_HOME")"
 CATEGORY="productivity"
 SKILL_NAME="autoresearch"
 TARGET_DIR="$HERMES_HOME/skills/$CATEGORY/$SKILL_NAME"
+SAFE_SKILLS_PREFIX="$HERMES_HOME/skills/"
+
+ensure_safe_target_dir() {
+  if [[ -z "$HERMES_HOME" || "$HERMES_HOME" == "/" ]]; then
+    echo "Error: Refusing to modify unsafe target directory: $TARGET_DIR"
+    exit 1
+  fi
+
+  case "$TARGET_DIR" in
+    "$SAFE_SKILLS_PREFIX"*) ;;
+    *)
+      echo "Error: Refusing to modify unsafe target directory: $TARGET_DIR"
+      exit 1
+      ;;
+  esac
+}
 
 # Resolve script location → repo root
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -54,6 +109,8 @@ if [[ ! -f "$SOURCE_DIR/SKILL.md" ]]; then
   echo "Error: SKILL.md not found in $SOURCE_DIR"
   exit 1
 fi
+
+ensure_safe_target_dir
 
 # --- Uninstall ---
 if [[ "$ACTION" == "uninstall" ]]; then

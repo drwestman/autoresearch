@@ -55,7 +55,7 @@ GUARD_BASELINE=$(<guard command>)
 
 ## Hermes Agent Launch Gate
 
-**After Phase 0 passes and the baseline metric is established — before entering Phase 1 — use presenting the config summary to the user to present the validated configuration and transition to the appropriate execution mode.**
+**After Phase 0 passes and the baseline metric is established — before entering Phase 1 — use `clarify` to present the validated configuration and transition to the appropriate execution mode.**
 
 Build the summary block from the confirmed config:
 
@@ -74,12 +74,7 @@ Build the summary block from the confirmed config:
 Then call:
 
 ```
-# Present config to user and confirm launch:
-# (
-  summary: <the formatted block above>,
-  recommendedAction: "autopilot",
-  actions: ["autopilot", "interactive", "exit_only"]
-)
+clarify(question=<the formatted block above + launch prompt>, choices=["autopilot", "interactive", "exit_only"])
 ```
 
 **Act on the selected action:**

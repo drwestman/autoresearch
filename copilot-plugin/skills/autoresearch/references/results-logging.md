@@ -19,7 +19,7 @@ BASELINE=$(npx jest --coverage 2>&1 | grep 'All files' | awk '{print $4}')
 
 # 4. Record baseline as iteration 0
 COMMIT=$(git rev-parse --short HEAD)
-echo -e "0\t${COMMIT}\t${BASELINE}\t0.0\tpass\tbaseline\tinitial state — coverage ${BASELINE}%" >> autoresearch-results.tsv
+echo -e "0\t${COMMIT}\t${BASELINE}\t0.0\tpass\t-\tbaseline\tinitial state — coverage ${BASELINE}%" >> autoresearch-results.tsv
 ```
 
 ## Logging Function
@@ -55,12 +55,12 @@ DISCARDS=$(grep -c 'discard' autoresearch-results.tsv || echo 0)
 CRASHES=$(grep -c 'crash' autoresearch-results.tsv || echo 0)
 
 # Detect stuck state: >5 consecutive discards triggers recovery
-LAST_5=$(tail -5 autoresearch-results.tsv | awk -F'\t' '{print $6}')
+LAST_5=$(grep -v '^#' autoresearch-results.tsv | awk -F'\t' '$1 != "iteration" {print $7}' | tail -5)
 # If all 5 are "discard" → trigger "When Stuck" protocol (re-read all files, try radical change)
 
 # Pattern recognition: which file changes succeed?
 # Cross-reference "keep" rows with git log to find winning patterns
-grep 'keep' autoresearch-results.tsv | awk -F'\t' '{print $7}'
+grep 'keep' autoresearch-results.tsv | awk -F'\t' '{print $8}'
 # → Shows descriptions of all successful changes
 ```
 
@@ -89,7 +89,7 @@ Guard: npm run typecheck
 # 1. Agent creates autoresearch-results.tsv with baseline 72.0
 # 2. Agent reads log (empty except baseline) → decides first experiment
 # 3. Agent modifies code, commits, runs verify → gets 74.5
-# 4. Agent appends: "1  b2c3d4e  74.5  +2.5  pass  keep  add auth middleware tests"
+# 4. Agent appends: "1  b2c3d4e  74.5  +2.5  pass  -  keep  add auth middleware tests"
 # 5. Next iteration: agent reads log, sees auth tests worked → tries similar pattern
 # 6. Continues until coverage reaches 90% or iterations exhausted
 ```

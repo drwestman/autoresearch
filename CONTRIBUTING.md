@@ -70,6 +70,11 @@ autoresearch/
 ├── .claude/                                       ← LOCAL development (gitignored except autoresearch)
 │   ├── commands/autoresearch/                     ← Dev copies of commands
 │   └── skills/autoresearch/                       ← Dev copies of skills
+├── hermes-plugin/                                 ← Hermes Agent distribution (maintained separately)
+│   └── skills/
+│       └── autoresearch/
+│           ├── SKILL.md                           ← Hermes-specific skill entry point
+│           └── references/                        ← Hermes-specific workflow references
 ├── guide/                                         ← Comprehensive guides — one per command
 │   ├── README.md                                  ← Guide index
 │   ├── getting-started.md                         ← Installation, core concepts, FAQ
@@ -111,6 +116,8 @@ autoresearch/
 | `references/predict-workflow.md` | `/autoresearch:predict` multi-persona swarm prediction workflow (751 lines). | Adding prediction personas, confidence models, output formats |
 | `references/learn-workflow.md` | `/autoresearch:learn` documentation engine protocol. | Adding doc types, validation checks, generation templates |
 | `references/results-logging.md` | TSV log format and reporting rules. | Changing log columns, summary format, reporting intervals |
+| `hermes-plugin/skills/autoresearch/SKILL.md` | Hermes-specific entry point. | Changing Hermes triggers, setup wording, or tool instructions |
+| `hermes-plugin/skills/autoresearch/references/*.md` | Hermes-specific workflows and examples. | Changing Hermes tool usage, launch flow, or platform-specific docs |
 | `claude-plugin/commands/autoresearch/*.md` | Sub-command registration files. | Adding new sub-commands (creates the `/autoresearch:name` slash command) |
 | `claude-plugin/.claude-plugin/plugin.json` | Plugin metadata + version. | Version bumps (use `scripts/release.sh`) |
 | `README.md` | Public overview, commands table, quick start. | Adding features, updating commands, documenting changes |
@@ -270,7 +277,14 @@ Add to the interactive setup gate table.
 
 ## Testing Your Changes
 
-No automated test suite — autoresearch is Markdown instructions, not code. Testing means using it:
+There is no broad language-level unit test suite, but there are targeted shell regression checks for packaging and doc invariants under `tests/`. Run those first, then test behavior interactively:
+
+```bash
+bash tests/test_hermes_docs.sh
+bash tests/test_install_hermes_safety.sh
+```
+
+Then validate the workflows in a live agent session:
 
 1. **Symlink your working tree** (see Quick Start)
 2. **Open Claude Code in a real project**
@@ -289,6 +303,12 @@ No automated test suite — autoresearch is Markdown instructions, not code. Tes
 ## Release Process
 
 Maintainers use `scripts/release.sh` to handle releases. See `scripts/release.md` for full documentation.
+
+### Hermes Plugin
+
+The `hermes-plugin/` directory is the Hermes Agent distribution. It is maintained separately because Hermes uses different tool names and interaction patterns than Claude Code or Copilot.
+
+**Hermes reference files are distribution-specific.** Edit `hermes-plugin/skills/autoresearch/references/` directly when changing Hermes behavior. The release script does not auto-sync Hermes references from `.claude/`.
 
 ```bash
 # Patch release (bugfixes, docs updates)

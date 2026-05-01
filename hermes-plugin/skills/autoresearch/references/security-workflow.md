@@ -692,10 +692,10 @@ jobs:
 
       - name: Install Autoresearch Skill
         run: |
-          git clone https://github.com/uditgoenkaautoresearch.git /tmpautoresearch
-          cp -r /tmpautoresearch/copilot-plugin/skillsautoresearch ~/.copilot/skillsautoresearch
-          cp -r /tmpautoresearch/copilot-plugin/commandsautoresearch ~/.copilot/commandsautoresearch
-          cp /tmpautoresearch/copilot-plugin/commandsautoresearch.md ~/.copilot/commandsautoresearch.md
+          git clone https://github.com/uditgoenka/autoresearch.git /tmp/autoresearch
+          cp -r /tmp/autoresearch/copilot-plugin/skills/autoresearch ~/.copilot/skills/autoresearch
+          cp -r /tmp/autoresearch/copilot-plugin/commands/autoresearch ~/.copilot/commands/autoresearch
+          cp /tmp/autoresearch/copilot-plugin/commands/autoresearch.md ~/.copilot/commands/autoresearch.md
 
       - name: Run Security Audit
         env:

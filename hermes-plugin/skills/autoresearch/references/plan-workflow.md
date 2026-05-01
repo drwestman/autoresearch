@@ -238,18 +238,13 @@ If no guard was set, omit the Guard line from the output.
 
 #### Hermes Agent Mode Integration
 
-Use the presenting the config summary to the user tool to present the config and let the user choose how to proceed:
+Use `clarify` to present the config summary and let the user choose how to proceed:
 
 ```
-# Present config to user and confirm launch:
-# (
-  summary: <the formatted configuration block above>,
-  recommendedAction: "autopilot",
-  actions: ["autopilot", "interactive", "exit_only"]
-)
+clarify(question=<the formatted configuration block above + launch prompt>, choices=["autopilot", "interactive", "exit_only"])
 ```
 
-**After presenting the config summary to the user returns, act on the selected action:**
+**After `clarify` returns, act on the selected action:**
 
 - `autopilot` → Invoke "autoresearch" with the full configuration. The loop runs uninterrupted in autopilot mode until the goal is achieved or the user intervenes.
 - `interactive` → Invoke "autoresearch" with the full configuration. The loop runs in interactive mode — ask for iteration count first if the user prefers bounded mode.

@@ -168,11 +168,10 @@ if [[ -d ".claude/skills/autoresearch" ]]; then
   echo "    Synced claude-plugin/skills/autoresearch/"
 fi
 
-# Sync references to hermes-plugin (SKILL.md is Hermes-specific, only sync references)
+# Hermes plugin content may diverge from .claude/, so do not auto-sync references.
 if [[ -d "hermes-plugin/skills/autoresearch/references" ]]; then
-  cp .claude/skills/autoresearch/references/*.md hermes-plugin/skills/autoresearch/references/
-  echo "    Synced hermes-plugin/skills/autoresearch/references/"
-  echo "    NOTE: hermes-plugin SKILL.md is Hermes-specific — update manually if needed"
+  echo "    Skipped hermes-plugin/skills/autoresearch/references/ auto-sync"
+  echo "    NOTE: Hermes reference files are distribution-specific — review and update manually if needed"
 fi
 
 # --- Doc review prompt ---

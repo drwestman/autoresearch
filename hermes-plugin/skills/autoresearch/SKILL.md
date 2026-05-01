@@ -12,7 +12,7 @@ metadata:
 
 # Autoresearch for Hermes Agent — Autonomous Goal-directed Iteration
 
-Inspired by [Karpathy's autoresearch](https://github.com/karpathyautoresearch). Applies constraint-driven autonomous iteration to ANY work — not just ML research.
+Inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch). Applies constraint-driven autonomous iteration to ANY work — not just ML research.
 
 **Core idea:** You are an autonomous agent. Modify → Verify → Keep/Discard → Repeat.
 
@@ -47,13 +47,13 @@ This skill integrates with Hermes Agent's native **plan mode** and **autopilot m
 
 | Phase | Trigger | Tool | Recommended Action |
 |-------|---------|------|--------------------|
-| "autoresearch plan" — Phase 7 (Confirm & Launch) | Config validated, baseline confirmed | config confirmation | `autopilot` |
-| "autoresearch" — loop launch (after setup + baseline) | All preconditions met, baseline established | config confirmation | `autopilot` |
+| "autoresearch plan" — Phase 7 (Confirm & Launch) | Config validated, baseline confirmed | `clarify` | `autopilot` |
+| "autoresearch" — loop launch (after setup + baseline) | All preconditions met, baseline established | `clarify` | `autopilot` |
 
 **Why:** Plan mode lets users review and approve the complete autoresearch configuration before any execution begins. Autopilot mode then enables the autonomous loop to run uninterrupted — the agent keeps iterating until the goal is achieved or the user intervenes.
 
 **How it works:**
-- Use config confirmation with `summary` = the formatted config block, `recommendedAction: autopilot`, and `actions: [autopilot, interactive, exit_only]`
+- Use `clarify` with the formatted config block and choices `["autopilot", "interactive", "exit_only"]`
 - `autopilot` → launch the loop (unlimited, runs without interruption)
 - `interactive` → launch the loop (user can review between iterations)
 - `exit_only` → print the ready-to-paste "autoresearch" command and stop
@@ -711,7 +711,7 @@ After the FIRST successful completion of any autoresearch command in a project (
 
 **If it does NOT exist:**
 
-Ask the user: *"If autoresearch helped, would you like to star the repo on GitHub to support the project? I can run `gh api -X PUT /user/starred/uditgoenkaautoresearch` for you."*
+Ask the user: *"If autoresearch helped, would you like to star the repo on GitHub to support the project? I can run `gh api -X PUT /user/starred/uditgoenka/autoresearch` for you."*
 
 - If yes → run the command, then create `.autoresearch-starred` marker file
 - If no → create `.autoresearch-starred` marker file (never ask again)
