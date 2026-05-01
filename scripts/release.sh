@@ -121,6 +121,16 @@ if [[ -f "$COPILOT_DIST_SKILL" ]] && grep -q "^version:" "$COPILOT_DIST_SKILL"; 
   fi
 fi
 
+HERMES_DIST_SKILL="hermes-plugin/skills/autoresearch/SKILL.md"
+if [[ -f "$HERMES_DIST_SKILL" ]] && grep -q "^version:" "$HERMES_DIST_SKILL"; then
+  echo "    Updating $HERMES_DIST_SKILL"
+  if [[ "$(uname)" == "Darwin" ]]; then
+    sed -i '' "s/^version: .*/version: $VERSION/" "$HERMES_DIST_SKILL"
+  else
+    sed -i "s/^version: .*/version: $VERSION/" "$HERMES_DIST_SKILL"
+  fi
+fi
+
 # --- Bump version in SKILL.md frontmatter ---
 SKILL_FILE=".claude/skills/autoresearch/SKILL.md"
 if [[ -f "$SKILL_FILE" ]] && grep -q "^version:" "$SKILL_FILE"; then
@@ -156,6 +166,12 @@ if [[ -d ".claude/skills/autoresearch" ]]; then
   cp .claude/skills/autoresearch/SKILL.md claude-plugin/skills/autoresearch/SKILL.md
   cp .claude/skills/autoresearch/references/*.md claude-plugin/skills/autoresearch/references/
   echo "    Synced claude-plugin/skills/autoresearch/"
+fi
+
+# Hermes plugin content may diverge from .claude/, so do not auto-sync references.
+if [[ -d "hermes-plugin/skills/autoresearch/references" ]]; then
+  echo "    Skipped hermes-plugin/skills/autoresearch/references/ auto-sync"
+  echo "    NOTE: Hermes reference files are distribution-specific — review and update manually if needed"
 fi
 
 # --- Doc review prompt ---

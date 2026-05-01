@@ -31,6 +31,19 @@ python3 plugins/autoresearch/scripts/install_local_plugin.py
 
 Use the wrapper CLI: `bin/autoresearch <subcommand> [flags]`
 
+### Hermes Agent
+
+```bash
+git clone https://github.com/uditgoenka/autoresearch.git
+cd autoresearch
+./scripts/install-hermes.sh
+```
+
+Then in a Hermes session: `hermes -s autoresearch` or `/skill autoresearch`.
+
+Use `./scripts/install-hermes.sh --link` for development (symlinks instead of copying).
+Use `./scripts/install-hermes.sh --uninstall` to remove.
+
 ### Manual (any agent)
 
 Copy the skill files into your agent's skill directory:
@@ -296,6 +309,14 @@ iteration  commit   metric  delta   guard   guard-metric  result_status  descrip
 - Wrapper CLI: `bin/autoresearch <subcommand> [flags]`
 - Canonical command spec: `plugins/autoresearch/resources/autoresearch-command-spec.json`
 
+### Hermes Agent
+
+- Commands are invoked as natural language: "autoresearch" and "autoresearch plan", "autoresearch debug", etc.
+- Interactive setup uses the `clarify` tool when context is missing
+- Skill files: `hermes-plugin/skills/autoresearch/SKILL.md` + `references/*.md`
+- Install: `./scripts/install-hermes.sh` (copies to `~/.hermes/skills/productivity/autoresearch/`)
+- Load: `hermes -s autoresearch` or `/skill autoresearch` mid-session
+
 ### Other Agents (OpenCode, Gemini CLI, etc.)
 
 - Read this file for the command surface and configuration contract
@@ -321,6 +342,9 @@ autoresearch/
 │   ├── skills/autoresearch/SKILL.md   ← Codex skill router + references/
 │   ├── resources/                     ← Command spec JSON
 │   └── scripts/                       ← Wrapper CLI
+├── hermes-plugin/                     ← Hermes Agent distribution package
+│   └── skills/autoresearch/SKILL.md   ← Hermes skill + references/
+├── scripts/install-hermes.sh          ← Hermes install script
 └── bin/autoresearch                   ← Convenience wrapper
 ```
 

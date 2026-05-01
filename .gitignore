@@ -10,6 +10,9 @@ Thumbs.db
 .claude/skills/*
 !.claude/skills/autoresearch/
 
+# Hermes Plans
+.hermes/plans/
+
 # Debug/temp files
 autoresearch-debug-fix-results.tsv
 *.log

@@ -187,6 +187,16 @@ cp autoresearch/claude-plugin/commands/autoresearch.md ~/.claude/commands/autore
 
 > **Note:** The `commands/` directory is required for subcommands (`/autoresearch:ship`, `/autoresearch:plan`, `/autoresearch:security`) to work.
 
+**Option C — Hermes Agent:**
+```bash
+git clone https://github.com/uditgoenka/autoresearch.git
+cd autoresearch
+./scripts/install-hermes.sh
+```
+
+Then in a Hermes session: `hermes -s autoresearch` or `/skill autoresearch`.
+Use `--link` for development (symlinks) or `--uninstall` to remove.
+
 ### 2. Run It
 
 ```
@@ -507,6 +517,13 @@ autoresearch/
 │               ├── learn-workflow.md              ← Documentation engine protocol
 │               ├── reason-workflow.md             ← Adversarial refinement protocol
 │               └── results-logging.md             ← TSV tracking format
+├── hermes-plugin/                                 ← Hermes Agent distribution package
+│   └── skills/autoresearch/
+│       ├── SKILL.md                               ← Hermes-adapted skill
+│       └── references/                            ← Same reference files (adapted for Hermes)
+├── scripts/
+│   ├── install-hermes.sh                          ← Hermes install/uninstall script
+│   └── release.sh                                 ← Release automation
 ```
 
 ---

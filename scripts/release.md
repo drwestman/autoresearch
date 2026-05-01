@@ -36,6 +36,8 @@
       → copilot-plugin/: copies 8 shared reference files from claude-plugin/
         (autonomous-loop-protocol, plan-workflow, and security-workflow are
          copilot-unique — they are NOT overwritten)
+      → hermes-plugin/: SKILL.md + references remain manually maintained
+        (Hermes reference files are distribution-specific and are NOT auto-synced)
 [4/7] Pause for doc review:
       → Shows changelog since last tag
       → Prompts you to review README.md, guide/, CONTRIBUTING.md
@@ -58,6 +60,7 @@ Before running the script, verify:
 - [ ] `gh` CLI is authenticated
 - [ ] If editing copilot-unique reference files (`autonomous-loop-protocol.md`, `plan-workflow.md`, `security-workflow.md`), edits are in `copilot-plugin/` directly
 - [ ] If editing shared reference files, edits are in `.claude/skills/autoresearch/references/` (not in `copilot-plugin/` directly)
+- [ ] If editing Hermes reference files, edits are in `hermes-plugin/skills/autoresearch/references/` directly
 
 ## Doc Review Guide
 
@@ -144,6 +147,12 @@ ln -s $(pwd)/copilot-plugin/commands/autoresearch.md ~/.copilot/commands/autores
 
 **Rule:** When editing shared reference files, edit them in `.claude/skills/autoresearch/references/`. The release script propagates the change to both `claude-plugin/` and `copilot-plugin/` automatically. When editing copilot-unique files, edit them directly in `copilot-plugin/`.
 
+### Hermes Plugin
+
+The `hermes-plugin/` directory is a separate distribution with Hermes-specific wording, examples, and tool semantics.
+
+**Hermes reference files are distribution-specific.** Do not auto-sync them from `.claude/` during release. Edit Hermes-specific workflow files directly in `hermes-plugin/skills/autoresearch/references/` and review them manually before shipping.
+
 ## Abort and Resume
 
 If you type `abort` at the merge prompt:
@@ -168,3 +177,4 @@ git checkout master && git branch -D release/X.Y.Z
 | ENAMETOOLONG on install | Ensure `marketplace.json` has `"source": "./claude-plugin"` (not `"./"`) |
 | Shared ref edit lost in copilot-plugin | Edits to shared refs must go in `.claude/`, not `copilot-plugin/` — the script overwrites them |
 | Copilot-unique file accidentally overwritten | Those 3 files are not in `SHARED_REFS` — if overwritten, restore from git: `git checkout HEAD -- copilot-plugin/skills/autoresearch/references/<file>` |
+| Hermes doc drift | Hermes reference files are distribution-specific — review `hermes-plugin/skills/autoresearch/references/` manually before release |
